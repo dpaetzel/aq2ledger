@@ -1,0 +1,78 @@
+# optional: custom executables (names or full paths). The following shows the default values
+
+ledgerExecutable:     ledger
+hledgerExecutable:    hledger
+dbaclExecutable:      dbacl
+aqBankingExecutable:  aqbanking-cli
+aqhbciToolExecutable: aqhbci-tool4
+
+# user config
+users:
+  - name: jo
+    ledgers:
+      ###  IMPORTANT NOTE: make sure the following files exist.
+      
+      ### As a safety feature `buchhaltung` will NOT create them on the fly, as
+      ### it cannot differentiate between a misconfigured config and the user's wish
+      ### to create an empty ledger. (enhancement: ask the user)
+
+      # main ledger file passed to `hledger` or `ledger` and used to create the commit message.
+      # this file should (at least) include the other files.
+      mainLedger:      jo/ledger.ledger
+
+      # optional: extra ledger file for hledger
+      # mainHledger:     <optional>
+
+      # ledger file for 'import'ed transactions.
+      # they are also used as suggestions for 'add'ing.
+      imported:        jo/import.ledger
+
+      # ledger file for manually 'add'ed transactions
+      addedByThisUser: jo/entered_by_jo.ledger
+
+      # optional: ledger file for transactions entered by other users
+      addedByOthers:   jo/entered_by_others.ledger
+
+    # optional: account prefix used when 'add'ing transactions for other users
+    accountPrefixOthers: Accounts receivable:Friends
+
+    # reverse the order of account paths
+    # (e.g. `Expenses:Food` has to be entered as `Food:Expenses`)
+    # (default: True)
+    reverseAccountInput: True
+
+    # regex matchind accounts whose should not be suggested when 'match'ing
+    ignoredAccountsOnMatch:
+      - "Old"
+
+    # regex matchind accounts whose transactions should not be suggested when 'add'ing
+    ignoredAccountsOnAdd:
+      - "Transfer"
+      - "Cash"
+
+    # bank accounts (grouped by bank id) and their corresponding ledger accounts
+    # to be used when 'import'ing
+    bankAccounts:
+      1243567:
+        8333777: "Assets:Bank Accounts:Bank A:Checking"
+        3827723: "Assets:Bank Accounts:Bank A:Savings"
+      <bank identifier code>:
+        <AccountNumber>: "<LedgerAccount>"
+      Paypal:
+        "<username>": "<LedgerAccount>"
+    aqBanking:
+      configDir: jo/aqbanking
+      connections:
+        - user: '<user>'
+          blz: '<bank identifier code>'
+          url: "<url>"
+          name: <User Name>
+          hbciv: HBCI300 # or one of HBCI201 | HBCI210 | HBCI220 | HBCI300
+          type: PinTan # or Other (see 'Manual AqBanking setup' in the documentation)
+  - name: alice
+    ledgers:
+      mainLedger:      alice/ledger.ledger
+      imported:        alice/import.ledger
+      addedByThisUser: alice/entered_by_alice.ledger
+      addedByOthers:   alice/entered_by_others.ledger
+    accountPrefixOthers: Accounts receivable:Friends

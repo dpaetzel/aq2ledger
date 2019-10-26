@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+
+tmp=$(mktemp)
+
+
+find src/ -type f | while read f; do
+    if ! ormolu --mode check "$f"; then
+        echo "$f is not properly formatted"
+        echo 1 > "$tmp"
+    fi
+done
+
+
+if test "X1" = "X$(cat "$tmp")"; then
+    exit 1
+fi
