@@ -30,7 +30,6 @@ data ConnectionConfig
       { name :: Text,
         -- ^ The local name for this connection
         blz :: Text,
-        account :: Text,
         url :: Text,
         login :: Text,
         -- ^ The login name to be used when connecting
@@ -82,7 +81,7 @@ The file path of the directory to save data related to the given connection in.
 configDir :: ConnectionConfig -> FilePath
 configDir conf =
   makeValid
-    $ path (parent conf) </> T.unpack (blz conf) <> "-" <> T.unpack (account conf)
+    $ path (parent conf) </> T.unpack (name conf) <> "-" <> T.unpack (blz conf) <> "-" <> T.unpack (login conf)
 
 {-|
 The file path of the aqbanking context file that should be used for the given
