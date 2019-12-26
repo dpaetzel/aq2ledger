@@ -1,0 +1,95 @@
+#!/usr/bin/env fish
+
+
+argparse 'D/cfgdir=' 'l/login=' 'n/name=' 'tanmedium=' -- $argv
+
+
+function debug
+    echo "* " $argv
+end
+
+
+if test "X$_flag_login" = "X"
+    echo "No login provided"
+    exit 1
+else
+    set login "$_flag_login"
+end
+
+
+if test "X$_flag_tanmedium" = "X"
+    echo "No TAN medium provided"
+    exit 1
+else
+    set tan_medium "$_flag_tanmedium"
+end
+
+
+if test "X$_flag_name" = "X"
+    echo "No local connection name provided"
+    exit 1
+else
+    set name "$_flag_name"
+end
+
+
+if test "X$_flag_cfgdir" = "X"
+    set dir (mktemp --directory (date -I)-XXXX-dkb)/"$name"
+    debug "Using fresh cfgdir "$dir""
+else
+    set dir "$_flag_cfgdir"
+    debug "Using cfgdir "$dir""
+end
+
+
+aqhbci-tool4 \
+    -D "$dir" \
+    adduser \
+    -t pintan \
+    --context=1 \
+    -b 12030000 \
+    -u "$login" \
+    -s "https://banking-dkb.s-fints-pt-dkb.de/fints30" \
+    -N "$name" \
+    --hbciversion=300
+
+
+and debug aqhbci-tool4 -D "$dir" listusers
+and aqhbci-tool4 -D "$dir" listusers
+and set unique_id (aqhbci-tool4 -D "$dir" listusers | sed -r 's/.*Unique Id: ([[:digit:]]).*/\1/')
+and debug unique id: $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" getbankinfo -u $unique_id
+and aqhbci-tool4 -D "$dir" getbankinfo -u $unique_id
+and debug aqhbci-tool4 -D "$dir" getsysid -u $unique_id
+and aqhbci-tool4 -D "$dir" getsysid -u $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id
+and aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id
+and set itan_mode (aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id | grep '.* \[available' | sed -r 's/^- ([[:digit:]]+) .*/\1/' | tail -1)
+and debug ITAN mode: $itan_mode
+
+
+and debug aqhbci-tool4 -D "$dir" setitanmode -u $unique_id -m $itan_mode
+and aqhbci-tool4 -D "$dir" setitanmode -u $unique_id -m $itan_mode
+and aqhbci-tool4 -D "$dir" setTanMediumId -u $unique_id -m "$tan_medium"
+and debug aqhbci-tool4 -D "$dir" getaccounts -u $unique_id
+and aqhbci-tool4 -D "$dir" getaccounts -u $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" listaccounts -v
+and aqhbci-tool4 -D "$dir" listaccounts -v
+# NOTE only "bank" accounts can be successfully processed further
+and set local_unique_ids (aqhbci-tool4 -D "$dir" listaccounts -v | grep 'Account Type: bank' | sed -r 's/.*LocalUniqueId: ([[:digit:]]+)/\1/')
+and debug local unique ids of bank accounts: $local_unique_ids
+
+
+and for id in $local_unique_ids
+  and debug aqhbci-tool4 -D "$dir" getaccsepa -a $id
+  and aqhbci-tool4 -D "$dir" getaccsepa -a $id
+end
+
+
+debug Setup finished for directory $dir

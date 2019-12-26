@@ -1,0 +1,89 @@
+#!/usr/bin/env fish
+
+
+argparse 'D/cfgdir=' 'l/login=' 'n/name=' -- $argv
+
+
+function debug
+    echo "* " $argv
+end
+
+
+if test "X$_flag_login" = "X"
+    echo "No login provided"
+    exit 1
+else
+    set login "$_flag_login"
+end
+
+
+if test "X$_flag_name" = "X"
+    echo "No local connection name provided"
+    exit 1
+else
+    set name "$_flag_name"
+end
+
+
+if test "X$_flag_cfgdir" = "X"
+    set dir (mktemp --directory (date -I)-XXXX-ksk)/"$name"
+    debug "Using fresh cfgdir "$dir""
+else
+    set dir "$_flag_cfgdir"/"$name"
+    debug "Using cfgdir $dir"
+end
+
+
+aqhbci-tool4 \
+    -D "$dir" \
+    adduser \
+    -t pintan \
+    --context=1 \
+    -b 72050101 \
+    -u "$login" \
+    -s "https://banking-by5.s-fints-pt-by.de/fints30" \
+    -N "$name" \
+    --hbciversion=300
+
+
+and debug aqhbci-tool4 -D "$dir" listusers
+and aqhbci-tool4 -D "$dir" listusers
+and set unique_id (aqhbci-tool4 -D "$dir" listusers | sed -r 's/.*Unique Id: ([[:digit:]]).*/\1/')
+and debug unique id: $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" getbankinfo -u $unique_id
+and aqhbci-tool4 -D "$dir" getbankinfo -u $unique_id
+and debug aqhbci-tool4 -D "$dir" getsysid -u $unique_id
+and aqhbci-tool4 -D "$dir" getsysid -u $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id
+and aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id
+and set itan_mode (aqhbci-tool4 -D "$dir" listitanmodes -u $unique_id | grep '.* \[available' | sed -r 's/^- ([[:digit:]]+) .*/\1/' )
+and debug ITAN mode: $itan_mode
+
+
+and debug aqhbci-tool4 -D "$dir" setitanmode -u $unique_id -m $itan_mode
+and aqhbci-tool4 -D "$dir" setitanmode -u $unique_id -m $itan_mode
+# setting up TAN medium seems not to be required for SMS TAN
+# and aqhbci-tool4 -D "$dir" setTanMediumId -u $unique_id -m "*TAN_MEDIUM_BEZEICHNUNG*"
+and debug aqhbci-tool4 -D "$dir" getaccounts -u $unique_id
+and aqhbci-tool4 -D "$dir" getaccounts -u $unique_id
+
+
+and debug aqhbci-tool4 -D "$dir" listaccounts -v
+and aqhbci-tool4 -D "$dir" listaccounts -v
+and set local_unique_ids (aqhbci-tool4 -D "$dir" listaccounts -v | grep '^Account' | sed -r 's/.*LocalUniqueId: ([[:digit:]]+)/\1/')
+and debug local unique ids: $local_unique_ids
+
+
+and for id in $local_unique_ids
+    and debug aqhbci-tool4 -D "$dir" addaccountflags -a $id -f preferCamtDownload
+    and aqhbci-tool4 -D "$dir" addaccountflags -a $id -f preferCamtDownload
+    and debug aqhbci-tool4 -D "$dir" getaccsepa -a $id
+    and aqhbci-tool4 -D "$dir" getaccsepa -a $id
+end
+
+
+debug Setup finished for directory $dir
