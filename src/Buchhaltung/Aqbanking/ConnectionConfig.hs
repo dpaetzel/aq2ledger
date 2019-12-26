@@ -78,10 +78,11 @@ instance CLIArg HBCIVersion where
 {-|
 The file path of the directory to save data related to the given connection in.
 -}
+-- TODO Make sure at top config level that this is unique
 configDir :: ConnectionConfig -> FilePath
 configDir conf =
   makeValid
-    $ path (parent conf) </> T.unpack (name conf) <> "-" <> T.unpack (blz conf) <> "-" <> T.unpack (login conf)
+    $ path (parent conf) </> T.unpack (name conf)
 
 {-|
 The file path of the aqbanking context file that should be used for the given
