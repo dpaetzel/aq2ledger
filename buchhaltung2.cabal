@@ -29,6 +29,7 @@ executable buchhaltung2
                      , filepath
                      , hledger-lib
                      , mtl
+                     , parsec
                      , process
                      , protolude
                      , QuickCheck
@@ -50,6 +51,7 @@ library
                      , filepath
                      , hledger-lib
                      , mtl
+                     , parsec
                      , process
                      , protolude
                      , QuickCheck

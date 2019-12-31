@@ -1,5 +1,5 @@
 { mkDerivation, aeson, base, bytestring, directory, filepath, hledger-lib, mtl
-, process, protolude, QuickCheck, stdenv, text, aqbanking }:
+, parsec, process, protolude, QuickCheck, stdenv, text, aqbanking }:
 mkDerivation {
   pname = "buchhaltung2";
   version = "0.1.0.0";
@@ -14,6 +14,7 @@ mkDerivation {
     filepath
     hledger-lib
     mtl
+    parsec
     process
     protolude
     QuickCheck
@@ -27,6 +28,7 @@ mkDerivation {
     filepath
     hledger-lib
     mtl
+    parsec
     process
     protolude
     QuickCheck
