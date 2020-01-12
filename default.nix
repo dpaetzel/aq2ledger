@@ -1,5 +1,6 @@
-{ mkDerivation, aeson, base, bytestring, directory, filepath, hledger-lib, mtl
-, parsec, process, protolude, QuickCheck, stdenv, text, aqbanking }:
+{ mkDerivation, aeson, base, bytestring, Decimal, directory, filepath
+, hledger-lib, mtl, parsec, process, protolude, QuickCheck, stdenv, text
+, aqbanking }:
 mkDerivation {
   pname = "buchhaltung2";
   version = "0.1.0.0";
@@ -10,6 +11,7 @@ mkDerivation {
     aeson
     base
     bytestring
+    Decimal
     directory
     filepath
     hledger-lib
@@ -24,6 +26,7 @@ mkDerivation {
     aeson
     base
     bytestring
+    Decimal
     directory
     filepath
     hledger-lib

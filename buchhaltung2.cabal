@@ -21,10 +21,12 @@ executable buchhaltung2
                      , Buchhaltung.Aqbanking.ConnectionConfig
                      , Buchhaltung.Aqbanking.Request
                      , Buchhaltung.Config
+                     , Buchhaltung.Format
                      , Buchhaltung.Prelude
   build-depends:       aeson
                      , base ^>=4.12.0.0
                      , bytestring
+                     , Decimal
                      , directory
                      , filepath
                      , hledger-lib
@@ -34,6 +36,7 @@ executable buchhaltung2
                      , protolude
                      , QuickCheck
                      , text
+                     , time
   hs-source-dirs:      src
   default-language:    Haskell2010
 
@@ -42,11 +45,13 @@ library
                      , Buchhaltung.Aqbanking.ConnectionConfig
                      , Buchhaltung.Aqbanking.Request
                      , Buchhaltung.Config
+                     , Buchhaltung.Format
                      , Buchhaltung.Prelude
                      , Main
   build-depends:       aeson
                      , base ^>=4.12.0.0
                      , bytestring
+                     , Decimal
                      , directory
                      , filepath
                      , hledger-lib
@@ -56,5 +61,32 @@ library
                      , protolude
                      , QuickCheck
                      , text
+                     , time
+  hs-source-dirs:      src
+  default-language:    Haskell2010
+
+executable buchhaltung2-test
+  main-is:             Test.hs
+  other-modules:
+                       Buchhaltung.Aqbanking
+                     , Buchhaltung.Aqbanking.ConnectionConfig
+                     , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.Config
+                     , Buchhaltung.Format
+                     , Buchhaltung.Prelude
+  build-depends:       aeson
+                     , base ^>=4.12.0.0
+                     , bytestring
+                     , Decimal
+                     , directory
+                     , filepath
+                     , hledger-lib
+                     , mtl
+                     , parsec
+                     , process
+                     , protolude
+                     , QuickCheck
+                     , text
+                     , time
   hs-source-dirs:      src
   default-language:    Haskell2010

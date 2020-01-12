@@ -12,12 +12,15 @@ Stability   : experimental
 TODO
 -}
 module Buchhaltung.Prelude
-  ( module Protolude,
-    module Buchhaltung.Prelude,
+  ( module Buchhaltung.Prelude,
+    module X,
   )
 where
 
-import Protolude
+import Protolude as X
+import Test.QuickCheck as X hiding
+  ( (.&.),
+  )
 
 {-|
 We need this type alias because 'System.Process' uses 'String's.

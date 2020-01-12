@@ -15,6 +15,7 @@ module Buchhaltung.Aqbanking.Request where
 
 import Buchhaltung.Aqbanking
 import Buchhaltung.Config
+import Buchhaltung.Format (listtransFormat)
 import Data.Text as T
 import Protolude
 
@@ -32,7 +33,7 @@ localTransactions = do
   read aqbankingExe
     [ "listtrans",
       "--ctxfile=" <> contextFile conf,
-      "--template=" <> "$(dateOrValutaDateAsString)\t$(localIban)\t$(remoteIban)\t$(valueAsString)\t$(purposeInOneLine)"
+      "--template=" <> listtransFormat
     ]
 
 {-|
