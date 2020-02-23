@@ -1,3 +1,6 @@
+src/TestConnections.hs
+
+
 # from https://raw.githubusercontent.com/github/gitignore/master/Haskell.gitignore
 dist
 dist-*

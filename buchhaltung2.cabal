@@ -23,6 +23,7 @@ executable buchhaltung2
                      , Buchhaltung.Config
                      , Buchhaltung.Format
                      , Buchhaltung.Parse
+                     , Buchhaltung.Parse.IBAN
                      , Buchhaltung.Prelude
                      , Test.QuickCheck.Hledger
   build-depends:       aeson
@@ -34,6 +35,7 @@ executable buchhaltung2
                      , filepath
                      , hledger-lib
                      , mtl
+                     , optparse-applicative
                      , parsec
                      , process
                      , protolude
@@ -52,6 +54,7 @@ library
                      , Buchhaltung.Config
                      , Buchhaltung.Format
                      , Buchhaltung.Parse
+                     , Buchhaltung.Parse.IBAN
                      , Buchhaltung.Prelude
                      , Main
                      , Test.QuickCheck.Hledger
@@ -64,6 +67,7 @@ library
                      , filepath
                      , hledger-lib
                      , mtl
+                     , optparse-applicative
                      , parsec
                      , process
                      , protolude
@@ -83,6 +87,7 @@ executable buchhaltung2-test
                      , Buchhaltung.Config
                      , Buchhaltung.Format
                      , Buchhaltung.Parse
+                     , Buchhaltung.Parse.IBAN
                      , Buchhaltung.Prelude
                      , Test.QuickCheck.Hledger
   build-depends:       aeson

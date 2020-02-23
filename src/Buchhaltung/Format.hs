@@ -74,7 +74,7 @@ exampleLine =
     purposeInOneLine = "Test"
 
 {-|
-Aqbanking's date format.
+Aqbanking's output date format.
 -}
 dateFormat :: String
 dateFormat = "%d.%m.%Y"
