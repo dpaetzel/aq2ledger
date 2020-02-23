@@ -12,9 +12,14 @@ Stability   : experimental
 
 TODO
 -}
-module Buchhaltung.Parse where
+module Buchhaltung.Parse
+  ( module Buchhaltung.Parse,
+    module Buchhaltung.Parse.IBAN,
+  )
+where
 
 import Buchhaltung.Format
+import Buchhaltung.Parse.IBAN
 import Buchhaltung.Prelude hiding (many)
 import Data.Decimal
 import qualified Data.Text as T
@@ -29,11 +34,12 @@ names to be used in Hledger journal.
 -}
 type AccountNameMap = (String, String) -> AccountName
 
-listtrans :: GenParser Char st (AccountNameMap -> [Transaction])
-listtrans = fmap (\x accountNameMap -> fmap ($ accountNameMap) x) $ many line
+listtrans :: IBANExtractor -> GenParser Char st (AccountNameMap -> [Transaction])
+listtrans =
+  fmap (\x accountNameMap -> fmap ($ accountNameMap) x) . many . line
 
-line :: GenParser Char st (AccountNameMap -> Transaction)
-line = do
+line :: IBANExtractor -> GenParser Char st (AccountNameMap -> Transaction)
+line fromIBAN = do
   localAccountNumber' <- many (noneOf "#\n")
   char '#'
   localBankCode' <- many (noneOf "#\n")
@@ -99,15 +105,8 @@ line = do
       }
 
 {-|
-Extracts bank code and account number from an IBAN (assuming German IBANs
-without spaces).
+The amount style I personally prefer.
 -}
-fromIBAN :: String -> (String, String)
-fromIBAN iban =
-  let bankCode = take 8 . drop 4 $ iban
-      accountNumber = dropWhile (== '0') . drop (8 + 4) $ iban
-   in (bankCode, accountNumber)
-
 amountStyle :: AmountStyle
 amountStyle =
   AmountStyle
@@ -119,7 +118,7 @@ amountStyle =
     }
 
 prop_exampleLineParses =
-  isRight . parse line "" $ exampleLine
+  isRight . parse (line fromIBANDE) "" $ exampleLine
 
 return []
 
