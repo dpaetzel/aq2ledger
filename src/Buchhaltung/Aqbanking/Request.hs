@@ -48,14 +48,17 @@ localTransactions' = do
     ]
 
 {-|
-Uses the @request@ subcommand to retrieve transactions.
+Uses the @request@ subcommand to retrieve all transactions between the given
+dates.
 -}
-getTransactions :: Aq ()
-getTransactions = do
+getTransactions :: String -> String -> Aq ()
+getTransactions from to = do
   conf <- ask
   run aqbankingExe
     [ "request",
       "--transactions",
       "--ignoreUnsupported",
-      "-ctxfile=" <> contextFile conf
+      "--fromdate=" <> from,
+      "--todate=" <> to,
+      "--ctxfile=" <> contextFile conf
     ]
