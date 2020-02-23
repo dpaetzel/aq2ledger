@@ -56,13 +56,17 @@ line = do
   char '#'
   remoteName <- many (noneOf "#\n")
   char '#'
-  -- NOTE There must be a nicer way to parse to Decimals
-  sign <- optionMaybe (char '-')
+  -- NOTE There has to be a nicer way to parse to Decimals.
+  sign' <- optionMaybe (char '-')
+  let sign =
+        case sign' of
+          Just _ -> negate
+          _ -> identity
   digits1 <- many digit
   char '.'
   digits2 <- many digit
-  let mantissa = fromIntegral $ length digits2
-  let value = Decimal mantissa (read digits1 * 10 ^ mantissa + read digits2)
+  let mantissa = fromIntegral . length $ digits2
+  let value = sign $ Decimal mantissa (read digits1 * 10 ^ mantissa + read digits2)
   char '#'
   purpose <- many (noneOf "\n")
   char '\n'
