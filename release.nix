@@ -4,7 +4,8 @@ let
       haskellPackages = pkgs.haskellPackages.override {
         overrides = haskellPackagesNew: haskellPackagesOld: rec {
           buchhaltung2 = haskellPackagesNew.callPackage ./default.nix {
-            aqbanking = pkgs.aqbanking;
+            # TODO aqbanking is not working in master currently (PR pending)
+            # aqbanking = pkgs.aqbanking;
           };
         };
       };

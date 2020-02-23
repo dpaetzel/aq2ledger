@@ -17,6 +17,8 @@ module Buchhaltung.Prelude
   )
 where
 
+import Data.Decimal as X
+import Data.List.Extra as X (groupOn)
 import Protolude as X
 import Test.QuickCheck as X hiding
   ( (.&.),

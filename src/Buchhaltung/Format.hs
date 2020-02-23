@@ -22,18 +22,25 @@ import Hledger.Data
 import Text.ParserCombinators.Parsec
 import Prelude (read)
 
-{-|
-Note that we do not use the fields '$(localIban)' and '$(localAccountNumber)'
-since they are not stable (aqbanking does usually only return one of the two
-from a given bank; which one it is seems to be arbitrary?). Instead We require
-this to be used in a context where the local account number or IBAN is already
-known.
--}
+-- Note that we do not use the fields '$(localIban)' and '$(localAccountNumber)'
+-- since they are not stable (aqbanking does usually only return one of the two
+-- from a given bank; which one it is seems to be arbitrary?). Instead we require
+-- this to be used in a context where the local account number or IBAN is already
+-- known.
+--
+-- There is a big problem with this approach, namely that some transactions
+-- don't have any indicator to which account they belong (at least for
+-- Kreissparkasse) and thus vanish if we use `listtrans --account=…` for every
+-- account there is although they do technically have to belong to one of the
+-- accounts.
 -- "\$(dateAsString)#\$(valutaDateAsString)#\$(remoteIban)#\$(valueAsString)#\$(purposeInOneLine)"
 listtransFormat :: String
 listtransFormat =
   intercalate "#"
-    [ "$(dateAsString)",
+    [ "$(localAccountNumber)",
+      "$(localBankCode)",
+      "$(localIBAN)",
+      "$(dateAsString)",
       "$(valutaDateAsString)",
       "$(remoteIban)",
       "$(remoteName)",
@@ -44,7 +51,10 @@ listtransFormat =
 exampleLine :: String
 exampleLine =
   intercalate "#"
-    [ dateAsString,
+    [ localAccountNumber,
+      localBankCode,
+      localIBAN,
+      dateAsString,
       valutaDateAsString,
       remoteIban,
       remoteName,
@@ -53,6 +63,9 @@ exampleLine =
     ]
     ++ "\n"
   where
+    localAccountNumber = ""
+    localBankCode = ""
+    localIBAN = "DE12345678900000000000"
     dateAsString = "01.01.2000"
     valutaDateAsString = "02.01.2000"
     remoteIban = "DE1234567890123456"

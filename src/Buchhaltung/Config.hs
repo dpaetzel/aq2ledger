@@ -26,7 +26,10 @@ data Config
         -- ^ We use 'String' because 'System.Process' only deals with those.
         aqbankingExe :: String,
         -- ^ We use 'String' because 'System.Process' only deals with those.
-        path :: FilePath
+        path :: FilePath,
+        accounts :: [(String, String)]
+        -- ^ Mapping of account numbers (numbers, not IBANs) to account names
+        -- used in Hledger journal.
       }
   deriving (Eq, Generic, Ord, Show)
 
