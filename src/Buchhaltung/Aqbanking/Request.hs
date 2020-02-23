@@ -3,29 +3,25 @@
 
 {-|
 Module      : Buchhaltung.Aqbanking.Request
-Description : TODO
+Description : Reading local and remote transactions
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+Reading local CTX files and downloading transactions to them.
 -}
 module Buchhaltung.Aqbanking.Request where
 
 import Buchhaltung.Aqbanking
 import Buchhaltung.Config
 import Buchhaltung.Format (listtransFormat)
+import Buchhaltung.Prelude
 import Data.Text as T
-import Protolude
 
 {-|
-From @aqbanking-cli listtrans --help@:
-
-> Default is (all in one line):
->   $(dateOrValutaDateAsString)\t$(valueAsString)\t$(localBankcode)\t
->    $(localAccountNumber)\t$(localIban)\t$(remoteName)\t$(remoteIban)\t
->    $(purposeInOneLine)
+Uses the @listtrans@ subcommand to list all local transactions for the
+'ConnectionConfig' currently selected.
 -}
 localTransactions :: Aq Text
 localTransactions = do
@@ -42,20 +38,6 @@ Uses the @export@ subcommand to list local transactions.
 This seems to work not as stably as the @listtrans@ subcommand used by
 'localTransaction' in that the account numbers are sometimes lacking (e.g. for
 Kreissparkasse connections)?
-
-  1="transactionId"
-    2="localBankCode"
-    3="localAccountNumber"
-    4="remoteBankCode"
-    5="remoteAccountNumber"
-    6="date"
-    7="valutadate"
-    8="value/value"
-    9="value/currency"
-    10="localName"
-    11="remoteName[0]"
-    12="remoteName[1]"
-
 -}
 localTransactions' :: Aq Text
 localTransactions' = do
@@ -65,7 +47,6 @@ localTransactions' = do
       "--ctxfile=" <> contextFile conf
     ]
 
--- TODO Find out whether dates are needed here
 {-|
 Uses the @request@ subcommand to retrieve transactions.
 -}

@@ -4,13 +4,14 @@
 
 {-|
 Module      : Buchhaltung.Aqbanking
-Description : TODO
+Description : Interface for aqbanking executables
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+Abstract monadic interface to run aqbanking executables; paths are retrieved
+from a 'Buchhaltung.Aqbanking.ConnectionConfig' in a 'ReaderT'.
 -}
 module Buchhaltung.Aqbanking
   ( module Buchhaltung.Aqbanking,
@@ -41,7 +42,8 @@ read aqhbciExe []
 is an 'Aq' action that runs the configured @aqhbci-tool4@ executable without
 arguments and returns its standard output.
 
-We use 'String's because 'System.Process' only deals with those.
+We use 'String's for command names and arguments because 'System.Process' only
+accepts those.
 -}
 read :: (Config -> String) -> [String] -> Aq Text
 read prog args = do
