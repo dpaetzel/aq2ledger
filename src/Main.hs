@@ -13,8 +13,8 @@ This is the main entry point of the @buchhaltung@ executable.
 -}
 module Main where
 
-import Buchhaltung.Aqbanking
-import Buchhaltung.Aqbanking.Request
+import Buchhaltung.AqBanking
+import Buchhaltung.AqBanking.Request
 import Buchhaltung.Hledger
 -- (defaultTimeLocale, parseTimeM)
 import Buchhaltung.Options
@@ -35,7 +35,7 @@ main = processOptions =<< execParser options'
     options' =
       info (options <**> helper)
         ( fullDesc
-            -- <> progDesc "Wrapper around aqbanking"
+            <> progDesc "Wrapper around AqBanking"
             <> header
                  "buchhaltung – gettin' your online banking stuff into\
                  \ (H)ledger"

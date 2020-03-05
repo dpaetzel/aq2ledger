@@ -37,8 +37,8 @@ executable buchhaltung2
   hs-source-dirs:      src
   main-is:             Main.hs
   other-modules:       Buchhaltung
-                     , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.AqBanking
+                     , Buchhaltung.AqBanking.Request
                      , Buchhaltung.BankAccount
                      , Buchhaltung.Config
                      , Buchhaltung.Format
@@ -70,8 +70,8 @@ library
                      , time
                      , yaml
   exposed-modules:     Buchhaltung
-                     , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.AqBanking
+                     , Buchhaltung.AqBanking.Request
                      , Buchhaltung.BankAccount
                      , Buchhaltung.Config
                      , Buchhaltung.Format
@@ -108,8 +108,8 @@ executable buchhaltung2-test
   hs-source-dirs:      src
   main-is:             Test.hs
   other-modules:       Buchhaltung
-                     , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.AqBanking
+                     , Buchhaltung.AqBanking.Request
                      , Buchhaltung.BankAccount
                      , Buchhaltung.Config
                      , Buchhaltung.Format

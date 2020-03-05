@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Aqbanking.Request
+Module      : Buchhaltung.AqBanking.Request
 Description : Retrieving local and remote transactions
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -11,9 +11,9 @@ Stability   : experimental
 
 Reading local CTX files and downloading transactions to them.
 -}
-module Buchhaltung.Aqbanking.Request where
+module Buchhaltung.AqBanking.Request where
 
-import Buchhaltung.Aqbanking
+import Buchhaltung.AqBanking
 import Buchhaltung.Format (listtransFormat)
 import Buchhaltung.Prelude
 

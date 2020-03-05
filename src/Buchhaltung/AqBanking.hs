@@ -4,18 +4,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Aqbanking
-Description : Interface for aqbanking executables
+Module      : Buchhaltung.AqBanking
+Description : Interface for AqBanking executables
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-Abstract monadic interface to run aqbanking executables; paths are retrieved
+Abstract monadic interface to run AqBanking executables; paths are retrieved
 from a 'Buchhaltung.Config.Config' in a 'ReaderT'.
 -}
-module Buchhaltung.Aqbanking
-  ( module Buchhaltung.Aqbanking,
+module Buchhaltung.AqBanking
+  ( module Buchhaltung.AqBanking,
     module Buchhaltung.Config,
   )
 where
