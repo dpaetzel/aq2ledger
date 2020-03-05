@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
@@ -11,24 +12,55 @@ Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
 Abstract monadic interface to run aqbanking executables; paths are retrieved
-from a 'Buchhaltung.Aqbanking.ConnectionConfig' in a 'ReaderT'.
+from a 'Buchhaltung.Config.Config' in a 'ReaderT'.
 -}
 module Buchhaltung.Aqbanking
   ( module Buchhaltung.Aqbanking,
-    module Buchhaltung.Aqbanking.ConnectionConfig,
     module Buchhaltung.Config,
   )
 where
 
-import Buchhaltung.Aqbanking.ConnectionConfig
 import Buchhaltung.Config
 import Buchhaltung.Prelude
-import Data.Text as T
+import qualified Data.Text as T
 import System.Process (callProcess, readProcess)
 
--- newtype Aq a = Aq {unAq :: ReaderT Config IO a}
---   deriving (Applicative, Functor, Monad, MonadIO, MonadReader Config)
-type Aq a = ReaderT ConnectionConfig IO a
+{-|
+Monad stack representing AqBanking computations.
+-}
+newtype Aq a = Aq {unAq :: ExceptT Text (ReaderT Config IO) a}
+  deriving
+    ( Applicative,
+      Functor,
+      Monad,
+      MonadError Text,
+      MonadIO,
+      MonadReader Config
+    )
+
+{-|
+Helper function to run @Aq@ computations.
+-}
+runAq :: Aq a -> Config -> IO (Either Text a)
+runAq aq = runReaderT (runExceptT . unAq $ aq)
+
+{-|
+Tries to extract the subconfiguration of the connection of the given name from
+the configuration.
+-}
+connection
+  :: (MonadError Text m, MonadReader Config m)
+  => Text
+  -> m ConnectionConfig
+connection nam = do
+  conn <- asks (connection' nam)
+  case conn of
+    Just conn -> return conn
+    Nothing ->
+      throwError $ "No connection configured with name '" <> nam <> "'"
+  where
+    connection' :: Text -> Config -> Maybe ConnectionConfig
+    connection' nam = find ((nam ==) . name) . connections
 
 {-|
 Runs the command with the supplied arguments using the first argument to
@@ -45,19 +77,27 @@ arguments and returns its standard output.
 We use 'String's for command names and arguments because 'System.Process' only
 accepts those.
 -}
-read :: (Config -> String) -> [String] -> Aq Text
-read prog args = do
-  cmd <- asks (prog . parent)
-  dir <- asks configDir
-  fmap T.pack . lift
-    $ readProcess cmd (["-D", dir] <> args) mempty
+read
+  :: (MonadIO m, MonadReader Config m)
+  => ConnectionConfig
+  -> (Config -> String)
+  -> [String]
+  -> m Text
+read conn prog args = do
+  cmd <- asks prog
+  fmap T.pack . liftIO
+    $ readProcess cmd (["-D", path conn] <> args) mempty
 
 {-|
 Like 'read' but only runs the command (without returning its standard output as
 'Text' object).
 -}
-run :: (Config -> String) -> [String] -> Aq ()
-run prog args = do
-  cmd <- asks (prog . parent)
-  dir <- asks configDir
-  lift $ callProcess cmd (["-D", dir] <> args)
+run
+  :: (MonadIO m, MonadReader Config m)
+  => ConnectionConfig
+  -> (Config -> String)
+  -> [String]
+  -> m ()
+run conn prog args = do
+  cmd <- asks prog
+  liftIO $ callProcess cmd (["-D", path conn] <> args)

@@ -15,17 +15,7 @@ category:            Finance
 extra-source-files:  config.yml
 
 executable buchhaltung2
-  main-is:             Main.hs
-  other-modules:       Buchhaltung
-                     , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.ConnectionConfig
-                     , Buchhaltung.Aqbanking.Request
-                     , Buchhaltung.Config
-                     , Buchhaltung.Format
-                     , Buchhaltung.Parse
-                     , Buchhaltung.Parse.IBAN
-                     , Buchhaltung.Prelude
-                     , Test.QuickCheck.Hledger
+  default-language:    Haskell2010
   build-depends:       aeson
                      , base ^>=4.12.0.0
                      , bytestring
@@ -43,21 +33,60 @@ executable buchhaltung2
                      , quickcheck-instances
                      , text
                      , time
+                     , yaml
   hs-source-dirs:      src
-  default-language:    Haskell2010
-
-library
+  main-is:             Main.hs
   other-modules:       Buchhaltung
                      , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.ConnectionConfig
                      , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.BankAccount
                      , Buchhaltung.Config
                      , Buchhaltung.Format
+                     , Buchhaltung.Hledger
+                     , Buchhaltung.Options
+                     , Buchhaltung.Parse
+                     , Buchhaltung.Parse.IBAN
+                     , Buchhaltung.Prelude
+                     , Test.QuickCheck.Hledger
+
+library
+  default-language:    Haskell2010
+  build-depends:       aeson
+                     , base ^>=4.12.0.0
+                     , bytestring
+                     , Decimal
+                     , directory
+                     , extra
+                     , filepath
+                     , hledger-lib
+                     , mtl
+                     , optparse-applicative
+                     , parsec
+                     , process
+                     , protolude
+                     , QuickCheck
+                     , quickcheck-instances
+                     , text
+                     , time
+                     , yaml
+  exposed-modules:     Buchhaltung
+                     , Buchhaltung.Aqbanking
+                     , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.BankAccount
+                     , Buchhaltung.Config
+                     , Buchhaltung.Format
+                     , Buchhaltung.Hledger
+                     , Buchhaltung.Options
                      , Buchhaltung.Parse
                      , Buchhaltung.Parse.IBAN
                      , Buchhaltung.Prelude
                      , Main
                      , Test.QuickCheck.Hledger
+  -- ghc-options:         -Wall -Wno-name-shadowing -Wno-orphans
+  ghc-options:         -Wunused-imports
+  hs-source-dirs:      src
+
+executable buchhaltung2-test
   build-depends:       aeson
                      , base ^>=4.12.0.0
                      , bytestring
@@ -67,7 +96,6 @@ library
                      , filepath
                      , hledger-lib
                      , mtl
-                     , optparse-applicative
                      , parsec
                      , process
                      , protolude
@@ -75,36 +103,19 @@ library
                      , quickcheck-instances
                      , text
                      , time
-  hs-source-dirs:      src
+                     , yaml
   default-language:    Haskell2010
-
-executable buchhaltung2-test
+  hs-source-dirs:      src
   main-is:             Test.hs
   other-modules:       Buchhaltung
                      , Buchhaltung.Aqbanking
-                     , Buchhaltung.Aqbanking.ConnectionConfig
                      , Buchhaltung.Aqbanking.Request
+                     , Buchhaltung.BankAccount
                      , Buchhaltung.Config
                      , Buchhaltung.Format
+                     , Buchhaltung.Hledger
+                     , Buchhaltung.Options
                      , Buchhaltung.Parse
                      , Buchhaltung.Parse.IBAN
                      , Buchhaltung.Prelude
                      , Test.QuickCheck.Hledger
-  build-depends:       aeson
-                     , base ^>=4.12.0.0
-                     , bytestring
-                     , Decimal
-                     , directory
-                     , extra
-                     , filepath
-                     , hledger-lib
-                     , mtl
-                     , parsec
-                     , process
-                     , protolude
-                     , QuickCheck
-                     , quickcheck-instances
-                     , text
-                     , time
-  hs-source-dirs:      src
-  default-language:    Haskell2010

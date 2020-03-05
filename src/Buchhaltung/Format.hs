@@ -4,36 +4,24 @@
 
 {-|
 Module      : Buchhaltung.Format
-Description : TODO
+Description : Format strings
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+The format strings used for calls of @aqbanking-cli@.
 -}
 module Buchhaltung.Format where
 
 import Buchhaltung.Prelude hiding (many)
-import Data.Decimal
-import qualified Data.Text as T
-import Data.Time.Format
-import Hledger.Data
-import Text.ParserCombinators.Parsec
-import Prelude (read)
 
--- Note that we do not use the fields '$(localIban)' and '$(localAccountNumber)'
--- since they are not stable (aqbanking does usually only return one of the two
--- from a given bank; which one it is seems to be arbitrary?). Instead we require
--- this to be used in a context where the local account number or IBAN is already
--- known.
---
--- There is a big problem with this approach, namely that some transactions
--- don't have any indicator to which account they belong (at least for
--- Kreissparkasse) and thus vanish if we use `listtrans --account=…` for every
--- account there is although they do technically have to belong to one of the
--- accounts.
--- "\$(dateAsString)#\$(valutaDateAsString)#\$(remoteIban)#\$(valueAsString)#\$(purposeInOneLine)"
+{-|
+We do use both '$(localIBAN)' as well as '$(localBankCode)' and
+'$(localAccountNumber)' since neither of those are stable (@aqbanking-cli
+listtrans@ does usually only return one of the two; which one seems to be
+arbitrary and dependent on the bank?).
+-}
 listtransFormat :: String
 listtransFormat =
   intercalate "#"
@@ -48,8 +36,12 @@ listtransFormat =
       "$(purposeInOneLine)"
     ]
 
-exampleLine :: String
-exampleLine =
+{-|
+An example line returned by @aqbanking listtrans --template=F@ where @F =
+'listtransFormat'@.
+-}
+exampleListtransLine :: String
+exampleListtransLine =
   intercalate "#"
     [ localAccountNumber,
       localBankCode,
@@ -74,7 +66,7 @@ exampleLine =
     purposeInOneLine = "Test"
 
 {-|
-Aqbanking's output date format.
+Output date format used by @aqbanking-cli@.
 -}
 dateFormat :: String
 dateFormat = "%d.%m.%Y"

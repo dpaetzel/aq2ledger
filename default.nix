@@ -1,6 +1,6 @@
 { mkDerivation, aeson, base, bytestring, Decimal, directory, filepath
 , hledger-lib, mtl, optparse-applicative, parsec, process, protolude, QuickCheck
-, quickcheck-instances, stdenv, text }:
+, quickcheck-instances, stdenv, text, yaml }:
 # TODO aqbanking is not working in master currently (PR pending)
 # , aqbanking }:
 mkDerivation {
@@ -25,6 +25,7 @@ mkDerivation {
     QuickCheck
     quickcheck-instances
     text
+    yaml
   ];
   executableHaskellDepends = [
     aeson
@@ -42,6 +43,7 @@ mkDerivation {
     QuickCheck
     quickcheck-instances
     text
+    yaml
   ];
   # TODO aqbanking is not working in master currently (PR pending)
   # executableSystemDepends = [ aqbanking ];

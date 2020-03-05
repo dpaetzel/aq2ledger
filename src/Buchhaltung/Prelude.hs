@@ -3,13 +3,13 @@
 
 {-|
 Module      : Buchhaltung.Prelude
-Description : TODO
+Description : Custom prelude based on Protolude
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+Custom prelude based on 'Protolude' with a few additions.
 -}
 module Buchhaltung.Prelude
   ( module Buchhaltung.Prelude,
@@ -23,8 +23,9 @@ import Protolude as X
 import Test.QuickCheck as X hiding
   ( (.&.),
   )
+import qualified Prelude
 
 {-|
-We need this type alias because 'System.Process' uses 'String's.
+This type alias is needed because 'System.Process' uses 'Prelude.String's.
 -}
-type String = [Char]
+type String = Prelude.String

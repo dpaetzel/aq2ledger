@@ -3,13 +3,14 @@
 
 {-|
 Module      : Buchhaltung.Parse.IBAN
-Description : TODO
+Description : Parsers for IBANs
 Copyright   : David Pätzel, 2020
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+A collection of functions that split IBANs into bank code and account number.
+This is required as IBAN lengths differ among countries.
 -}
 module Buchhaltung.Parse.IBAN where
 

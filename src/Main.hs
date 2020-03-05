@@ -1,6 +1,5 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TupleSections #-}
 
 {-|
 Module      : Main
@@ -14,101 +13,24 @@ This is the main entry point of the @buchhaltung@ executable.
 -}
 module Main where
 
-import Buchhaltung
 import Buchhaltung.Aqbanking
 import Buchhaltung.Aqbanking.Request
-import Buchhaltung.Format
+import Buchhaltung.Hledger
+-- (defaultTimeLocale, parseTimeM)
+import Buchhaltung.Options
 import Buchhaltung.Parse
 import Buchhaltung.Prelude hiding (option)
-import Control.Arrow ((&&&))
-import Data.Decimal
-import Data.List (lookup)
+import Data.Either.Extra (mapLeft)
 import qualified Data.Text as T
 import Data.Time.Calendar (Day)
-import Data.Time.Format -- (defaultTimeLocale, parseTimeM)
-import Hledger.Data
-import Hledger.Read
+import qualified Data.Yaml as Y
+import Hledger.Data hiding (Account)
 import Options.Applicative
-import Test.QuickCheck.Hledger hiding (def)
 import TestConnections
-import Text.Parsec hiding (option)
-
--- TODO Add better parse errors here
-dateOption :: Mod OptionFields Day -> Parser Day
-dateOption =
-  option . eitherReader $ \s -> parseTimeM True defaultTimeLocale "%Y%m%d" s
-
-optionalDateOption :: Mod OptionFields (Maybe Day) -> Parser (Maybe Day)
-optionalDateOption =
-  option
-    . fmap Just
-    . eitherReader
-    $ \s -> parseTimeM True defaultTimeLocale "%Y%m%d" s
-
-data Options
-  = Download
-      { from :: Day,
-        to :: Maybe Day
-        -- configFile :: FilePath
-      }
-  | Print
-      { from :: Day,
-        to :: Maybe Day
-        -- configFile :: FilePath
-      }
-  deriving (Show)
-
-downloadOptions :: Parser Options
-downloadOptions =
-  Download
-    <$> dateOption
-          ( long "from"
-              <> short 'f'
-              <> metavar "YYYYMMDD"
-              <> help "First date to download transactions for"
-          )
-    <*> optionalDateOption
-          ( long "to"
-              <> short 't'
-              <> metavar "YYYYMMDD"
-              <> help
-                   "Last date to download transactions for (leave out for\
-                   \ 'today')"
-              <> value Nothing
-          )
-
-printOptions :: Parser Options
-printOptions =
-  Print
-    <$> dateOption
-          ( long "from"
-              <> short 'f'
-              <> metavar "YYYYMMDD"
-              <> help "Only print transactions after this date"
-          )
-    <*> optionalDateOption
-          ( long "to"
-              <> short 't'
-              <> metavar "YYYYMMDD"
-              <> help
-                   "Only print transactions before this date (leave out for\
-                   \ 'today')"
-              <> value Nothing
-          )
-
-options :: Parser Options
-options =
-  subparser
-    ( command "download"
-        ( info downloadOptions (progDesc "Download transactions")
-        )
-        <> command "print"
-             ( info printOptions (progDesc "Print downloaded transactions")
-             )
-    )
+import Text.Parsec hiding (option, optional)
 
 main :: IO ()
-main = main' =<< execParser options'
+main = processOptions =<< execParser options'
   where
     options' =
       info (options <**> helper)
@@ -119,32 +41,59 @@ main = main' =<< execParser options'
                  \ (H)ledger"
         )
 
-main' :: Options -> IO ()
-main' opts = do
-  putText . show $ opts
+processOptions :: Options -> IO ()
+processOptions ExampleConfig =
+  putText . decodeUtf8 . encode $ (def :: Config)
+processOptions opts = do
   let con = testConnectionKSK2
   case opts of
     Download {} ->
       putText "Download not yet supported by CLI"
-    Print from to -> do
-      s <- runReaderT localTransactions con
-      case parse (listtrans fromIBANDE) "" (T.unpack s) of
-        Left err -> putText . show $ err
-        Right t ->
-          sequence_
-            $ putStrLn . showTransaction
-              <$> (restrictTxs from to . t $ accountNameMap con)
+    Print from to confFile nam -> printTxs from to confFile nam
 
-restrictTxs :: Day -> Maybe Day -> [Transaction] -> [Transaction]
-restrictTxs from Nothing = filter (\tx -> from <= tdate tx)
-restrictTxs from (Just to) = filter (\tx -> from <= tdate tx && tdate tx <= to)
+printTxs :: Day -> Maybe Day -> Maybe FilePath -> Maybe ConnectionName -> IO ()
+printTxs from to confFile' nam = do
+  confFile <- maybe defaultConfigFile return confFile'
+  conf' <- readConfigFile confFile
+  case conf' of
+    Left err -> putStrLn err
+    Right conf ->
+      sequence_ $ (<$> connections conf) $ \con -> do
+        sE <- runAq (localTransactions con) conf
+        let t = do
+              s <- sE
+              mapLeft show $ parse (listtrans fromIBANDE) "" (T.unpack s)
+        case t of
+          Left err -> putText err
+          Right t ->
+            sequence_
+              $ putStrLn . showTransaction
+                <$> (restrictTxs from to . t $ accountNameMap conf)
 
--- TODO Text/String things are bad here and elsewhere
-accountNameMap :: ConnectionConfig -> (String, String) -> Text
-accountNameMap conf x =
-  T.pack
-    . fromMaybe "TODO"
-    . lookup x
-    . fmap (first (T.unpack $ blz conf,))
-    $ accounts (parent conf)
+{-|
+Parses the given config file.
 
+An alternative implementation may be
+
+> readConfigFile :: (MonadIO m, MonadError Text m) => FilePath -> m Config
+> readConfigFile =
+>   ((liftEither . first (T.pack . Y.prettyPrintParseException)) =<<)
+>     . liftIO
+>     . Y.decodeFileEither
+-}
+readConfigFile :: FilePath -> IO (Either String Config)
+readConfigFile = fmap (first Y.prettyPrintParseException) . Y.decodeFileEither
+-- main'' :: IO ()
+-- main'' = do
+--   journal <- readJournalFile definputopts "Buchhaltung1Test.ledger"
+--   case journal of
+--     Left err -> putText . show $ err
+--     Right j -> do
+--       sequence_ $ putStrLn . showTransaction <$> jtxns j
+--       -- sequence_ $ putText . show <$> jtxns j
+--       sequence_
+--         $ putText . show
+--           . positive
+--           . realPostings
+--           <$> jtxns j
+--   putText "Done."

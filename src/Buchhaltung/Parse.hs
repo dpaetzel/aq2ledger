@@ -4,24 +4,26 @@
 
 {-|
 Module      : Buchhaltung.Parse
-Description : TODO
+Description : Parsers from @aqbanking-cli@ to Hledger
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-TODO
+Parsers for converting @aqbanking-cli@ output to Haskell values (i.e. Hledger
+'Hledger.Data.Transactions' etc.).
 -}
 module Buchhaltung.Parse
-  ( module Buchhaltung.Parse,
-    module Buchhaltung.Parse.IBAN,
+  ( module Buchhaltung.Parse.IBAN,
+    AccountNameMap,
+    listtrans,
   )
 where
 
+import Buchhaltung.BankAccount
 import Buchhaltung.Format
 import Buchhaltung.Parse.IBAN
 import Buchhaltung.Prelude hiding (many)
-import Data.Decimal
 import qualified Data.Text as T
 import Data.Time.Format
 import Hledger.Data
@@ -29,15 +31,29 @@ import Text.ParserCombinators.Parsec
 import Prelude (read)
 
 {-|
-Maps combinations of bank code and account number (in that order) to account
-names to be used in Hledger journal.
+Maps bank accounts to account names to be used in Hledger journal.
 -}
-type AccountNameMap = (String, String) -> AccountName
+type AccountNameMap = BankAccount -> AccountName
 
-listtrans :: IBANExtractor -> GenParser Char st (AccountNameMap -> [Transaction])
+{-|
+Parses the output of @aqbanking-cli listtrans@ to a list of
+'Hledger.Data.Transaction's.
+
+The resulting value still requires an 'AccountNameMap' in order to properly
+assign Hledger 'Hledger.Data.AccountName's to the bank accounts.
+
+Note that the result is slightly opinionated as it uses my personal preference
+of an 'Hledger.Data.AmountStyle'.
+-}
+listtrans
+  :: IBANExtractor
+  -> GenParser Char st (AccountNameMap -> [Transaction])
 listtrans =
   fmap (\x accountNameMap -> fmap ($ accountNameMap) x) . many . line
 
+{-|
+Parses a single line of the output of @aqbanking-cli listtrans@.
+-}
 line :: IBANExtractor -> GenParser Char st (AccountNameMap -> Transaction)
 line fromIBAN = do
   localAccountNumber' <- many (noneOf "#\n")
@@ -97,7 +113,7 @@ line fromIBAN = do
         tdate2 = Just valutaDate,
         tdescription = T.pack purpose,
         tpostings =
-          [ post (mapping (localBankCode, localAccountNumber))
+          [ post (mapping (BankAccount localBankCode localAccountNumber))
               $ (eur value) {acommodity = "EUR", astyle = amountStyle},
             post "TODO"
               $ (eur $ negate value) {acommodity = "EUR", astyle = amountStyle}
@@ -118,7 +134,7 @@ amountStyle =
     }
 
 prop_exampleLineParses =
-  isRight . parse (line fromIBANDE) "" $ exampleLine
+  isRight . parse (line fromIBANDE) "" $ exampleListtransLine
 
 return []
 
