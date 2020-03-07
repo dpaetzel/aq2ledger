@@ -3,7 +3,7 @@
 {-# LANGUAGE TemplateHaskell #-}
 
 {-|
-Module      : Buchhaltung.Format
+Module      : Aq2Ledger.Format
 Description : Format strings
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -12,9 +12,9 @@ Stability   : experimental
 
 The format strings used for calls of @aqbanking-cli@.
 -}
-module Buchhaltung.Format where
+module Aq2Ledger.Format where
 
-import Buchhaltung.Prelude hiding (many)
+import Aq2Ledger.Prelude hiding (many)
 
 {-|
 We do use both '$(localIBAN)' as well as '$(localBankCode)' and

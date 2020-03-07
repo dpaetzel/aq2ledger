@@ -13,12 +13,14 @@ Test suite accumulating all tests in the project.
 -}
 module Main where
 
-import Buchhaltung.Format as Format
-import Buchhaltung.Parse as Parse
-import Buchhaltung.Prelude
+import Aq2Ledger
+import Aq2Ledger.Format as Format
+import Aq2Ledger.Parse as Parse
+import Aq2Ledger.Prelude
 
 main :: IO ()
 main = do
   _ <- Format.runTests
+  _ <- Aq2Ledger.runTests
   _ <- Parse.runTests
   return ()

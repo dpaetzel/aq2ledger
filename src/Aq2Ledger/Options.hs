@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Options
+Module      : Aq2Ledger.Options
 Description : Command line options
 Copyright   : David Pätzel, 2020
 License     : GPL-3
@@ -12,10 +12,10 @@ Stability   : experimental
 This module specifies how command line arguments are parsed into an 'Options'
 value.
 -}
-module Buchhaltung.Options where
+module Aq2Ledger.Options where
 
-import Buchhaltung.Config
-import Buchhaltung.Prelude hiding (option)
+import Aq2Ledger.Config
+import Aq2Ledger.Prelude hiding (option)
 import Data.Time.Calendar (Day)
 import Data.Time.Format
 import Options.Applicative

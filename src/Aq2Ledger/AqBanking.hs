@@ -4,7 +4,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.AqBanking
+Module      : Aq2Ledger.AqBanking
 Description : Interface for AqBanking executables
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -12,16 +12,16 @@ Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
 Abstract monadic interface to run AqBanking executables; paths are retrieved
-from a 'Buchhaltung.Config.Config' in a 'ReaderT'.
+from a 'Aq2Ledger.Config.Config' in a 'ReaderT'.
 -}
-module Buchhaltung.AqBanking
-  ( module Buchhaltung.AqBanking,
-    module Buchhaltung.Config,
+module Aq2Ledger.AqBanking
+  ( module Aq2Ledger.AqBanking,
+    module Aq2Ledger.Config,
   )
 where
 
-import Buchhaltung.Config
-import Buchhaltung.Prelude
+import Aq2Ledger.Config
+import Aq2Ledger.Prelude
 import qualified Data.Text as T
 import System.Process (callProcess, readProcess)
 
@@ -65,7 +65,7 @@ connection nam = do
 {-|
 Runs the command with the supplied arguments using the first argument to
 extract the command to run (i.e., the file path to its executable etc.) from
-'Buchhaltung.Config' and returns its standard output as 'Data.Text'. Thus,
+'Aq2Ledger.Config' and returns its standard output as 'Data.Text'. Thus,
 
 @
 read aqhbciExe []

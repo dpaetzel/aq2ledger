@@ -3,7 +3,7 @@ let
     packageOverrides = pkgs: rec {
       haskellPackages = pkgs.haskellPackages.override {
         overrides = haskellPackagesNew: haskellPackagesOld: rec {
-          buchhaltung2 = haskellPackagesNew.callPackage ./default.nix {
+          aq2ledger = haskellPackagesNew.callPackage ./default.nix {
             # TODO aqbanking is not working in master currently (PR pending)
             # aqbanking = pkgs.aqbanking;
           };
@@ -21,5 +21,5 @@ let
   }) { inherit config; };
 in {
   aqbanking = pkgs.aqbanking;
-  buchhaltung2 = pkgs.haskellPackages.buchhaltung2;
+  aq2ledger = pkgs.haskellPackages.aq2ledger;
 }

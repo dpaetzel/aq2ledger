@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.AqBanking.Setup
+Module      : Aq2Ledger.AqBanking.Setup
 Description : TODO
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -12,13 +12,14 @@ Stability   : experimental
 
 TODO
 
-For now, we require the user to set up AqBanking manually because there are too many difference between banks.
+For now, we require the user to set up AqBanking manually because there are too
+many difference between banks.
 
 See https://www.aquamaniac.de/rdm/projects/aqbanking/wiki/SetupPinTan .
 -}
-module Buchhaltung.AqBanking.Setup where
+module Aq2Ledger.AqBanking.Setup where
 
-import Buchhaltung.AqBanking
+import Aq2Ledger.AqBanking
 import Data.Yaml
 import Protolude
 

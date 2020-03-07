@@ -9,17 +9,17 @@ License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-This is the main entry point of the @buchhaltung@ executable.
+This is the main entry point of the @aq2ledger@ executable.
 -}
 module Main where
 
-import Buchhaltung.AqBanking
-import Buchhaltung.AqBanking.Request
-import Buchhaltung.Hledger
+import Aq2Ledger.AqBanking
+import Aq2Ledger.AqBanking.Request
+import Aq2Ledger.Hledger
 -- (defaultTimeLocale, parseTimeM)
-import Buchhaltung.Options
-import Buchhaltung.Parse
-import Buchhaltung.Prelude hiding (option)
+import Aq2Ledger.Options
+import Aq2Ledger.Parse
+import Aq2Ledger.Prelude hiding (option)
 import Data.Either.Extra (mapLeft)
 import qualified Data.Text as T
 import Data.Time.Calendar (Day)
@@ -37,8 +37,7 @@ main = processOptions =<< execParser options'
         ( fullDesc
             <> progDesc "Wrapper around AqBanking"
             <> header
-                 "buchhaltung – gettin' your online banking stuff into\
-                 \ (H)ledger"
+                 "aq2ledger – gettin' your online banking stuff into (H)ledger"
         )
 
 processOptions :: Options -> IO ()
@@ -83,17 +82,3 @@ An alternative implementation may be
 -}
 readConfigFile :: FilePath -> IO (Either String Config)
 readConfigFile = fmap (first Y.prettyPrintParseException) . Y.decodeFileEither
--- main'' :: IO ()
--- main'' = do
---   journal <- readJournalFile definputopts "Buchhaltung1Test.ledger"
---   case journal of
---     Left err -> putText . show $ err
---     Right j -> do
---       sequence_ $ putStrLn . showTransaction <$> jtxns j
---       -- sequence_ $ putText . show <$> jtxns j
---       sequence_
---         $ putText . show
---           . positive
---           . realPostings
---           <$> jtxns j
---   putText "Done."

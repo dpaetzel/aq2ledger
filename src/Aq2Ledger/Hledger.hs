@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Hledger
+Module      : Aq2Ledger.Hledger
 Description : Hledger-related helpers
 Copyright   : David Pätzel, 2020
 License     : GPL-3
@@ -11,9 +11,9 @@ Stability   : experimental
 
 A collection of Hledger-related helper functions.
 -}
-module Buchhaltung.Hledger where
+module Aq2Ledger.Hledger where
 
-import Buchhaltung.Prelude
+import Aq2Ledger.Prelude
 import Data.Time.Calendar (Day)
 import Hledger.Data
 

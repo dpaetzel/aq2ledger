@@ -3,24 +3,24 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Config
+Module      : Aq2Ledger.Config
 Description : Configuration data types
 Copyright   : David Pätzel, 2019
 License     : GPL-3
 Maintainer  : David Pätzel <david.paetzel@posteo.de>
 Stability   : experimental
 
-Buchhaltung configuration.
+Configuration for the @aq2ledger@ executable.
 -}
-module Buchhaltung.Config
-  ( module Buchhaltung.Config,
+module Aq2Ledger.Config
+  ( module Aq2Ledger.Config,
     Data.Yaml.decode,
     Data.Yaml.encode,
   )
 where
 
-import Buchhaltung.BankAccount
-import Buchhaltung.Prelude
+import Aq2Ledger.BankAccount
+import Aq2Ledger.Prelude
 import Data.Aeson
 import Data.List (lookup)
 import qualified Data.Text as T
@@ -35,7 +35,7 @@ class Default a where
   def :: a
 
 {-|
-Buchhaltung's configuration.
+Configuration data type for the @aq2ledger@ executable.
 -}
 data Config
   = Config

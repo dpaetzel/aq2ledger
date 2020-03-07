@@ -4,7 +4,7 @@
 # TODO aqbanking is not working in master currently (PR pending)
 # , aqbanking }:
 mkDerivation {
-  pname = "buchhaltung2";
+  pname = "aq2ledger";
   version = "0.1.0.0";
   src = ./.;
   isLibrary = true;
@@ -48,7 +48,7 @@ mkDerivation {
   # TODO aqbanking is not working in master currently (PR pending)
   # executableSystemDepends = [ aqbanking ];
   doHaddock = false;
-  homepage = "https://github.com/dpaetzel/buchhaltung2";
+  homepage = "https://github.com/dpaetzel/aq2ledger";
   description = "Automates plain text accounting data entry in ledger format";
   license = stdenv.lib.licenses.gpl3;
 }

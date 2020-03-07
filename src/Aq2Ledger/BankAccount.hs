@@ -3,7 +3,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.BankAccount
+Module      : Aq2Ledger.BankAccount
 Description : Bank account identifiers
 Copyright   : David Pätzel, 2020
 License     : GPL-3
@@ -12,9 +12,9 @@ Stability   : experimental
 
 A simple data type for identifying bank accounts.
 -}
-module Buchhaltung.BankAccount where
+module Aq2Ledger.BankAccount where
 
-import Buchhaltung.Prelude
+import Aq2Ledger.Prelude
 import Data.Yaml
 
 data BankAccount

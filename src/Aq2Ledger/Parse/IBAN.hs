@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Parse.IBAN
+Module      : Aq2Ledger.Parse.IBAN
 Description : Parsers for IBANs
 Copyright   : David Pätzel, 2020
 License     : GPL-3
@@ -12,9 +12,9 @@ Stability   : experimental
 A collection of functions that split IBANs into bank code and account number.
 This is required as IBAN lengths differ among countries.
 -}
-module Buchhaltung.Parse.IBAN where
+module Aq2Ledger.Parse.IBAN where
 
-import Buchhaltung.Prelude
+import Aq2Ledger.Prelude
 
 {-|
 A function that extracts bank code and account number from an IBAN.

@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.Prelude
+Module      : Aq2Ledger.Prelude
 Description : Custom prelude based on Protolude
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -11,8 +11,8 @@ Stability   : experimental
 
 Custom prelude based on 'Protolude' with a few additions.
 -}
-module Buchhaltung.Prelude
-  ( module Buchhaltung.Prelude,
+module Aq2Ledger.Prelude
+  ( module Aq2Ledger.Prelude,
     module X,
   )
 where

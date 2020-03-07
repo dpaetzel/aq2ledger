@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 {-|
-Module      : Buchhaltung.AqBanking.Request
+Module      : Aq2Ledger.AqBanking.Request
 Description : Retrieving local and remote transactions
 Copyright   : David Pätzel, 2019
 License     : GPL-3
@@ -11,11 +11,11 @@ Stability   : experimental
 
 Reading local CTX files and downloading transactions to them.
 -}
-module Buchhaltung.AqBanking.Request where
+module Aq2Ledger.AqBanking.Request where
 
-import Buchhaltung.AqBanking
-import Buchhaltung.Format (listtransFormat)
-import Buchhaltung.Prelude
+import Aq2Ledger.AqBanking
+import Aq2Ledger.Format (listtransFormat)
+import Aq2Ledger.Prelude
 
 {-|
 Uses the @listtrans@ subcommand to list all local transactions for the

@@ -1,1 +1,1 @@
-(import ./release.nix).buchhaltung2.env
+(import ./release.nix).aq2ledger.env
