@@ -45,18 +45,18 @@ coming into effect making support for more recent AqBanking versions mandatory.
 * Installation
 ** Setup AqBanking for your bank.
    Currently this has to be done manually. However, there are scripts for
-   Kreissparkasse and DKB that may help you get started (@setup-ksk@ and
-   @setup-dkb@, respectively).
+   Kreissparkasse and DKB that may help you get started (~setup-ksk~ and
+   ~setup-dkb~, respectively).
 ** [[https://nixos.org/][Nix]] users
    1. Install /aqbanking/ somehow (you need a recent version; probably use [[https://github.com/NixOS/nixpkgs/pull/71304][this]]
       PR). As soon as that gets merged into the nixpkgs master, I'll include it
-      in @default.nix@.
+      in [[file:default.nix][default.nix]].
    2. Clone this repository and enter your local copy.
       #+BEGIN_SRC bash
 git clone https://github.com/dpaetzel/aq2ledger
 cd aq2ledger
       #+END_SRC
-   3. Enter the @nix-shell@.
+   3. Enter the ~nix-shell~.
       #+BEGIN_SRC bash
 nix-shell
       #+END_SRC
@@ -64,14 +64,14 @@ nix-shell
       #+BEGIN_SRC bash
 cabal build exe:aq2ledger
       #+END_SRC
-   5. Run the executable (all options after “--” are passed to @aq2ledger@
-      and not @cabal@).
+   5. Run the executable (all options after “--” are passed to ~aq2ledger~
+      and not ~cabal~).
       #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- --help
       #+END_SRC
       Alternatively, use (or copy) the executable from somewhere below the
-      freshly generated @dist-newstyle@ directory (for me, it's
-      @dist-newstyle/build/x86_64-linux/ghc-8.6.5/aq2ledger-0.1.0.0/x/aq2ledger/build/aq2ledger/aq2ledger@).
+      freshly generated ~dist-newstyle~ directory (for me, it's
+      ~dist-newstyle/build/x86_64-linux/ghc-8.6.5/aq2ledger-0.1.0.0/x/aq2ledger/build/aq2ledger/aq2ledger~).
 ** Other users
    1. Make sure the following is installed:
       - GHC
@@ -86,14 +86,14 @@ cd aq2ledger
       #+BEGIN_SRC bash
 cabal build exe:aq2ledger
       #+END_SRC
-   4. Run the executable (all options after “--” are passed to @aq2ledger@
-      and not @cabal@).
+   4. Run the executable (all options after “--” are passed to ~aq2ledger~
+      and not ~cabal~).
       #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- --help
       #+END_SRC
       Alternatively, use (or copy) the executable from somewhere below the
-      freshly generated @dist-newstyle@ directory (for me, it's
-      @dist-newstyle/build/x86_64-linux/ghc-8.6.5/aq2ledger-0.1.0.0/x/aq2ledger/build/aq2ledger/aq2ledger@).
+      freshly generated ~dist-newstyle~ directory (for me, it's
+      ~dist-newstyle/build/x86_64-linux/ghc-8.6.5/aq2ledger-0.1.0.0/x/aq2ledger/build/aq2ledger/aq2ledger~).
 * Configuration
   You probably want to generate an example config:
   #+BEGIN_SRC bash
@@ -108,14 +108,14 @@ cabal run exe:aq2ledger -- exampleconf > config.yml
   #+BEGIN_SRC bash
 ./setup-ksk -D "$configdir" -l 123456789 -n "$connectionname" # ,
   #+END_SRC
-  you should set the @path@ in the configuration of that connection to
-  @"$configdir/$connectionname"@.
+  you should set the ~path~ in the configuration of that connection to
+  ~"$configdir/$connectionname"~.
 
   You probably want to add (H)Ledger account names for your bank accounts in
-  your configuration as well, this is done in the @accounts@ field (the example
+  your configuration as well, this is done in the ~accounts~ field (the example
   config contains examples for that).
 * Running
-  With your config file being @my/config@, you can, for example, download all
+  With your config file being ~my/config~, you can, for example, download all
   transactions since a certain date.
   #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- download -C my/config --from 20200101
