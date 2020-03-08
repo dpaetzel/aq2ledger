@@ -15,6 +15,7 @@ The format strings used for calls of @aqbanking-cli@.
 module Aq2Ledger.Format where
 
 import Aq2Ledger.Prelude hiding (many)
+import Data.Time (Day, defaultTimeLocale, formatTime)
 
 {-|
 We do use both '$(localIBAN)' as well as '$(localBankCode)' and
@@ -68,8 +69,20 @@ exampleListtransLine =
 {-|
 Output date format used by @aqbanking-cli@.
 -}
-dateFormat :: String
-dateFormat = "%d.%m.%Y"
+outDateFormat :: String
+outDateFormat = "%d.%m.%Y"
+
+{-|
+Input date format used by @aqbanking-cli@.
+-}
+inDateFormat :: String
+inDateFormat = "%Y%m%d"
+
+{-|
+Formats a 'Data.Time.Calendar.Day' as a AqBanking-compatible string.
+-}
+asAqDate :: Day -> String
+asAqDate = formatTime defaultTimeLocale inDateFormat
 
 return []
 

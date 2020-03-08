@@ -15,13 +15,14 @@ module Main where
 
 import Aq2Ledger.AqBanking
 import Aq2Ledger.AqBanking.Request
+import Aq2Ledger.Format (asAqDate)
 import Aq2Ledger.Hledger
--- (defaultTimeLocale, parseTimeM)
 import Aq2Ledger.Options
 import Aq2Ledger.Parse
 import Aq2Ledger.Prelude hiding (option)
 import Data.Either.Extra (mapLeft)
 import qualified Data.Text as T
+import Data.Time (getCurrentTime, utctDay)
 import Data.Time.Calendar (Day)
 import qualified Data.Yaml as Y
 import Hledger.Data hiding (Account)
@@ -44,9 +45,25 @@ processOptions ExampleConfig =
   putText . decodeUtf8 . encode $ (def :: Config)
 processOptions opts = do
   case opts of
-    Download {} ->
-      putText "Download not yet supported by CLI"
+    Download from to confFile -> downloadTxs from to confFile
     Print from to confFile nam -> printTxs from to confFile nam
+
+downloadTxs
+  :: Day
+  -> Maybe Day
+  -> Maybe FilePath
+  -> IO ()
+downloadTxs from to' confFile' = do
+  confFile <- maybe defaultConfigFile return confFile'
+  conf' <- readConfigFile confFile
+  case conf' of
+    Left err -> putStrLn err
+    Right conf ->
+      sequence_ $ (<$> connections conf) $ \con -> do
+        to <- maybe today return to'
+        runAq conf $ getTransactions con (asAqDate from) (asAqDate to)
+  where
+    today = utctDay <$> getCurrentTime
 
 printTxs :: Day -> Maybe Day -> Maybe FilePath -> Maybe ConnectionName -> IO ()
 printTxs from to confFile' nam = do
@@ -56,7 +73,7 @@ printTxs from to confFile' nam = do
     Left err -> putStrLn err
     Right conf ->
       sequence_ $ (<$> connections conf) $ \con -> do
-        sE <- runAq (localTransactions con) conf
+        sE <- runAq conf $ localTransactions con
         let t = do
               s <- sE
               mapLeft show $ parse (listtrans fromIBANDE) "" (T.unpack s)

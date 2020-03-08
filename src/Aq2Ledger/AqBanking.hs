@@ -41,8 +41,8 @@ newtype Aq a = Aq {unAq :: ExceptT Text (ReaderT Config IO) a}
 {-|
 Helper function to run @Aq@ computations.
 -}
-runAq :: Aq a -> Config -> IO (Either Text a)
-runAq aq = runReaderT (runExceptT . unAq $ aq)
+runAq :: Config -> Aq a -> IO (Either Text a)
+runAq conf aq = runReaderT (runExceptT . unAq $ aq) conf
 
 {-|
 Tries to extract the subconfiguration of the connection of the given name from

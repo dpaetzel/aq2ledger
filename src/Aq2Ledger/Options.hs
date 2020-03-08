@@ -50,6 +50,7 @@ connectionOption =
            \ the command on (leave out for ‘all connections’)"
 
 -- TODO Add better parse errors here
+-- TODO Unify used format string with Aq2Ledger.Format.asAqDate
 dateOption :: Mod OptionFields Day -> Parser Day
 dateOption =
   option . eitherReader $ parseTimeM True defaultTimeLocale "%Y%m%d"

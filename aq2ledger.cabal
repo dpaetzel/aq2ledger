@@ -96,6 +96,7 @@ executable aq2ledger-test
                      , filepath
                      , hledger-lib
                      , mtl
+                     , optparse-applicative
                      , parsec
                      , process
                      , protolude

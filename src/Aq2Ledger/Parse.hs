@@ -17,11 +17,12 @@ module Aq2Ledger.Parse
   ( module Aq2Ledger.Parse.IBAN,
     AccountNameMap,
     listtrans,
+    runTests,
   )
 where
 
 import Aq2Ledger.BankAccount
-import Aq2Ledger.Format
+import Aq2Ledger.Format hiding (runTests)
 import Aq2Ledger.Parse.IBAN
 import Aq2Ledger.Prelude hiding (many)
 import qualified Data.Text as T
@@ -69,10 +70,10 @@ line fromIBAN = do
         | not . null $ localIBAN = fromIBAN localIBAN
         | otherwise = ("", "")
   date <-
-    parseTimeOrError True defaultTimeLocale dateFormat <$> many (noneOf "#\n")
+    parseTimeOrError True defaultTimeLocale outDateFormat <$> many (noneOf "#\n")
   char '#'
   valutaDate <-
-    parseTimeOrError True defaultTimeLocale dateFormat <$> many (noneOf "#\n")
+    parseTimeOrError True defaultTimeLocale outDateFormat <$> many (noneOf "#\n")
   char '#'
   remoteIBAN <- many (noneOf "#\n")
   char '#'
