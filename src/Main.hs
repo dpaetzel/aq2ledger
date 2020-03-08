@@ -26,7 +26,6 @@ import Data.Time.Calendar (Day)
 import qualified Data.Yaml as Y
 import Hledger.Data hiding (Account)
 import Options.Applicative
-import TestConnections
 import Text.Parsec hiding (option, optional)
 
 main :: IO ()
@@ -44,7 +43,6 @@ processOptions :: Options -> IO ()
 processOptions ExampleConfig =
   putText . decodeUtf8 . encode $ (def :: Config)
 processOptions opts = do
-  let con = testConnectionKSK2
   case opts of
     Download {} ->
       putText "Download not yet supported by CLI"
