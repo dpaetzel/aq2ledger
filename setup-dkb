@@ -1,7 +1,9 @@
 #!/usr/bin/env fish
+#
+# See https://www.aquamaniac.de/rdm/projects/aqbanking/wiki/SetupPinTan .
 
 
-argparse 'D/cfgdir=' 'l/login=' 'n/name=' 'tanmedium=' -- $argv
+argparse 'D/cfgdir=' 'l/login=' 'n/name=' 'm/tanmedium=' -- $argv
 
 
 function debug
@@ -35,10 +37,10 @@ end
 
 if test "X$_flag_cfgdir" = "X"
     set dir (mktemp --directory (date -I)-XXXX-dkb)/"$name"
-    debug "Using fresh cfgdir "$dir""
+    debug "Using fresh cfgdir $dir"
 else
-    set dir "$_flag_cfgdir"
-    debug "Using cfgdir "$dir""
+    set dir "$_flag_cfgdir"/"$name"
+    debug "Using cfgdir $dir"
 end
 
 
