@@ -1,0 +1,102 @@
+#+TITLE: aq2ledger
+/aq2ledger/ downloads transactions from your banks and prints them in a plain
+text format readable by [[https://www.ledger-cli.org/][Ledger]] and its [[https://plaintextaccounting.org/][derivatives]]. Inspired by (actually, kind
+of a rewrite of) Johannes Gerer's [[https://github.com/johannesgerer/buchhaltung][buchhaltung]] which seized to work due to PSD2
+coming into effect making support for more recent AqBanking versions mandatory.
+* Aims
+  - [ ] Setup AqBanking automagically.
+    - For now, this has to be done manually.
+    - However, /aq2ledger/ comes with scripts to setup connections to the
+      following banks:
+      - DKB
+      - Kreissparkasse
+  - [X] Download transaction data.
+    - Specify a start and, optionally, an end date to download all
+      transactions that occurred between them.
+    - /aq2ledger/ uses [[https://www.aquamaniac.de/rdm/][AqBanking]] to download transactions; that tool currently
+      supports
+      - HBCI (2.01, 2.10, 2.20 and FinTS 3.00)
+      - EBICS (2.3 and 2.4)
+      - OFX Direct Connect
+      - PayPal (transaction data only)
+      I did not yet have the opportunity to test /aq2ledger/'s support of EBICS,
+      OFX and PayPal—please share any positive or negative experiences.
+    - Restriction: You might have to enter a lot of PINs and TANs if you have
+      many accounts (thank you, PSD2).
+  - [X] Transform AqBanking's transaction data into (H)Ledger format.
+    - Specify a start and, optionally, an end date to print all transactions
+      locally saved (i.e. previously downloaded) by AqBanking that occurred
+      between them.
+    - Automatically associate transactions with preconfigured (H)Ledger
+      accounts.
+  - [ ] Merge automatically with existing (H)Ledger journals.
+    - This requires a stable deduplication scheme; I have a few ideas but did
+      not get around to implementing them yet.
+* Differences to [[http://johannesgerer.com/buchhaltung][buchhaltung]]
+  - No “semi-automatic matching of transactions using Bayesian classification”.
+    I never used that feature and do not plan to add it to /aq2ledger/; if you
+    think it would add /a lot/ of value, feel free to open an issue and start a
+    discussion.
+  - No “semi-automatic transaction entry with meaningful suggestions in
+    keyboard-based speed mode”. I never used that feature either; nevertheless,
+    data entry could definitely be enhanced (I enter stuff directly in Emacs
+    using a few handy custom [[https://github.com/joaotavora/yasnippet][YASnippets]]).
+  - Also, see the pending issues under [[Aims]].
+* Installation
+** Setup AqBanking for your bank.
+   Currently this has to be done manually. However, there are scripts for
+   Kreissparkasse and DKB that may help you get started (@setup-ksk@ and
+   @setup-dkb@, respectively).
+** [[https://nixos.org/][Nix]] users
+   1. Clone this repository and enter your local copy.
+      #+BEGIN_SRC bash
+git clone https://github.com/dpaetzel/aq2ledger
+cd aq2ledger
+      #+END_SRC
+   2. Enter the @nix-shell@.
+      #+BEGIN_SRC bash
+nix-shell
+      #+END_SRC
+   3. Build the executable.
+      #+BEGIN_SRC bash
+cabal build exe:aq2ledger
+      #+END_SRC
+   4. Run the executable (all options after “--” are passed to @aq2ledger@
+      and not @cabal@).
+      #+BEGIN_SRC bash
+cabal run exe:aq2ledger -- --help
+      #+END_SRC
+      Alternatively, use (or copy) the executable from somewhere below the
+      freshly generated @dist-newstyle@ directory (for me, it's
+      @dist-newstyle/build/x86_64-linux/ghc-8.6.5/aq2ledger-0.1.0.0/x/aq2ledger/build/aq2ledger/aq2ledger@).
+** Other users
+* Configuration
+  You probably want to generate an example config:
+  #+BEGIN_SRC bash
+cabal run exe:aq2ledger -- exampleconf > config.yml
+  #+END_SRC
+  The config should be pretty self-explanatory; if something's unclear, check
+  the Haskell documentation in [[file:src/Aq2Ledger/Config.hs][Config.hs]] (or feel free to open an issue and I
+  will add documentation).
+
+  Hint: If you used one of the provided scripts for setting up an AqBanking
+  connection like so
+  #+BEGIN_SRC bash
+./setup-ksk -D "$configdir" -l 123456789 -n "$connectionname" # ,
+  #+END_SRC
+  you should set the @path@ in the configuration of that connection to
+  @"$configdir/$connectionname"@.
+
+  You probably want to add (H)Ledger account names for your bank accounts in
+  your configuration as well, this is done in the @accounts@ field (the example
+  config contains examples for that).
+* Running
+  With your config file being @my/config@, you can, for example, download all
+  transactions since a certain date.
+  #+BEGIN_SRC bash
+cabal run exe:aq2ledger -- download -C my/config --from 20200101
+  #+END_SRC
+  Documentation for all commmands possible is in the help text.
+  #+BEGIN_SRC bash
+cabal run exe:aq2ledger -- --help
+  #+END_SRC

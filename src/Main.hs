@@ -37,13 +37,13 @@ main = processOptions =<< execParser options'
         ( fullDesc
             <> progDesc "Wrapper around AqBanking"
             <> header
-                 "aq2ledger – gettin' your online banking stuff into (H)ledger"
+                 "aq2ledger – gettin' your online banking stuff into (H)Ledger"
         )
 
 processOptions :: Options -> IO ()
 processOptions ExampleConfig =
   putText . decodeUtf8 . encode $ (def :: Config)
-processOptions opts = do
+processOptions opts =
   case opts of
     Download from to confFile -> downloadTxs from to confFile
     Print from to confFile nam -> printTxs from to confFile nam

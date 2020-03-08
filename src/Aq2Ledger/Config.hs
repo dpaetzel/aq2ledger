@@ -62,8 +62,8 @@ instance Default Config where
         ],
       connections =
         [ ConnectionConfig
-            { name = "1",
-              path = "connection1"
+            { name = "Connection 1",
+              path = "path/to/this/connection's/aqbanking/directory"
             }
         ]
     }
