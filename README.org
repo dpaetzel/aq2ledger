@@ -112,15 +112,15 @@ cabal run exe:aq2ledger -- exampleconf > config.yml
   ~"$configdir/$connectionname"~.
 
   You probably want to add (H)Ledger account names for your bank accounts in
-  your configuration as well, this is done in the ~accounts~ field (the example
+  your configuration as well; this is done in the ~accounts~ field (the example
   config contains examples for that).
 * Running
   With your config file being ~my/config~, you can, for example, download all
-  transactions since a certain date.
+  transactions since a certain date:
   #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- download -C my/config --from 20200101
   #+END_SRC
-  Documentation for all commmands possible is in the help text.
+  Documentation for all supported commmands is in the help text:
   #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- --help
   #+END_SRC
