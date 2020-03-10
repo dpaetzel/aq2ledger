@@ -47,7 +47,6 @@ executable aq2ledger
                      , Aq2Ledger.Parse
                      , Aq2Ledger.Parse.IBAN
                      , Aq2Ledger.Prelude
-                     , Test.QuickCheck.Hledger
 
 library
   default-language:    Haskell2010
@@ -81,7 +80,6 @@ library
                      , Aq2Ledger.Parse.IBAN
                      , Aq2Ledger.Prelude
                      , Main
-                     , Test.QuickCheck.Hledger
   -- ghc-options:         -Wall -Wno-name-shadowing -Wno-orphans
   ghc-options:         -Wunused-imports
   hs-source-dirs:      src
@@ -119,4 +117,3 @@ executable aq2ledger-test
                      , Aq2Ledger.Parse
                      , Aq2Ledger.Parse.IBAN
                      , Aq2Ledger.Prelude
-                     , Test.QuickCheck.Hledger
