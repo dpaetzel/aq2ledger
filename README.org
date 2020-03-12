@@ -41,7 +41,7 @@ coming into effect making support for more recent AqBanking versions mandatory.
     keyboard-based speed mode”. I never used that feature either; nevertheless,
     data entry could definitely be enhanced (I enter stuff directly in Emacs
     using a few handy custom [[https://github.com/joaotavora/yasnippet][YASnippets]]).
-  - Also, see the pending issues under [[Aims]].
+  - Also, see the pending features under [[Aims]].
 * Installation
 ** Setup AqBanking for your bank.
    Currently this has to be done manually. However, there are scripts for
@@ -64,7 +64,7 @@ nix-shell
       #+BEGIN_SRC bash
 cabal build exe:aq2ledger
       #+END_SRC
-   5. Run the executable (all options after “--” are passed to ~aq2ledger~
+   5. Run the executable (all options after ~--~ are passed to ~aq2ledger~
       and not ~cabal~).
       #+BEGIN_SRC bash
 cabal run exe:aq2ledger -- --help

@@ -15,7 +15,6 @@ module Main where
 
 import Aq2Ledger.AqBanking
 import Aq2Ledger.AqBanking.Request
-import Aq2Ledger.Format (asAqDate)
 import Aq2Ledger.Hledger
 import Aq2Ledger.Options
 import Aq2Ledger.Parse
@@ -61,7 +60,7 @@ downloadTxs from to' confFile' = do
     Right conf ->
       sequence_ $ (<$> connections conf) $ \con -> do
         to <- maybe today return to'
-        runAq conf $ getTransactions con (asAqDate from) (asAqDate to)
+        runAq conf $ getTransactions con from to
   where
     today = utctDay <$> getCurrentTime
 

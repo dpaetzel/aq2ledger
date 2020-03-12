@@ -1,6 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 
+-- TODO Add log messages
 {-|
 Module      : Aq2Ledger.AqBanking.Request
 Description : Retrieving local and remote transactions
@@ -14,8 +15,9 @@ Reading local CTX files and downloading transactions to them.
 module Aq2Ledger.AqBanking.Request where
 
 import Aq2Ledger.AqBanking
-import Aq2Ledger.Format (listtransFormat)
+import Aq2Ledger.Format (asAqDate, listtransFormat)
 import Aq2Ledger.Prelude
+import Data.Time
 
 {-|
 Uses the @listtrans@ subcommand to list all local transactions for the
@@ -47,13 +49,21 @@ localTransactions' conn =
 Uses the @request@ subcommand to retrieve all transactions between the given
 dates.
 -}
-getTransactions :: ConnectionConfig -> String -> String -> Aq ()
+getTransactions :: ConnectionConfig -> Day -> Day -> Aq ()
 getTransactions conn from to =
-  run conn aqbankingExe
-    [ "request",
-      "--transactions",
-      "--ignoreUnsupported",
-      "--fromdate=" <> from,
-      "--todate=" <> to,
-      "--ctxfile=" <> contextFile conn
-    ]
+  sequence_ . (<$> spans) $ \(from, to) ->
+    run conn aqbankingExe
+      [ "request",
+        "--transactions",
+        "--ignoreUnsupported",
+        "--fromdate=" <> asAqDate from,
+        "--todate=" <> asAqDate to,
+        "--ctxfile=" <> contextFile conn
+      ]
+  where
+    spans = spans' from
+    spans' from'
+      | diffDays to from' <= 30 = [(from, addDays 1 to)]
+      | otherwise = (from', to') : spans' (addDays 1 to')
+      where
+        to' = addDays 30 from'
