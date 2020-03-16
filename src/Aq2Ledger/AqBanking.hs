@@ -23,7 +23,8 @@ where
 import Aq2Ledger.Config
 import Aq2Ledger.Prelude
 import qualified Data.Text as T
-import System.Process (callProcess, readProcess)
+import Data.Time (Day, getCurrentTime, utctDay)
+import System.Process (callProcess, readProcessWithExitCode)
 
 {-|
 Monad stack representing AqBanking computations.
@@ -78,19 +79,24 @@ We use 'String's for command names and arguments because 'System.Process' only
 accepts those.
 -}
 read
-  :: (MonadIO m, MonadReader Config m)
+  :: (MonadError Text m, MonadIO m, MonadReader Config m)
   => ConnectionConfig
   -> (Config -> String)
   -> [String]
   -> m Text
 read conn prog args = do
   cmd <- asks prog
-  fmap T.pack . liftIO
-    $ readProcess cmd (["-D", path conn] <> args) mempty
+  (exitCode, stdout, stderr) <-
+    liftIO
+      $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
+  if exitCode /= ExitSuccess
+    then throwError $ T.pack stderr
+    else return $ T.pack stdout
 
 {-|
-Like 'read' but only runs the command (without returning its standard output as
-'Text' object).
+Like 'read' but only runs the command in a fire-and-forget way (doesn't return
+or check any of the command's exit code, stdout or stderr) providing it with an
+empty stdin (see 'interact' for the non-empty stdin).
 -}
 run
   :: (MonadIO m, MonadReader Config m)
@@ -100,4 +106,26 @@ run
   -> m ()
 run conn prog args = do
   cmd <- asks prog
-  liftIO $ callProcess cmd (["-D", path conn] <> args)
+  _ <- liftIO $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
+  return ()
+
+{-|
+Like 'read' but runs the command and allows to interact with it (i.e. nothing is
+piped into stdin).
+-}
+interact
+  :: (MonadIO m, MonadReader Config m)
+  => ConnectionConfig
+  -> (Config -> String)
+  -> [String]
+  -> m ()
+interact conn prog args = do
+  cmd <- asks prog
+  _ <- liftIO $ callProcess cmd (["-D", path conn] <> args)
+  return ()
+
+{-|
+Today's date.
+-}
+today :: Aq Day
+today = liftIO $ utctDay <$> getCurrentTime

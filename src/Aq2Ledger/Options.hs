@@ -41,13 +41,12 @@ configFileOption =
            "The config file to use (default:\
            \ $HOME/.config/buchhaltung/config.yml)"
 
-connectionOption :: Parser (Maybe ConnectionName)
+connectionOption :: Parser ConnectionName
 connectionOption =
-  optional . argument str
+  argument str
     $ metavar "CONNECTIONNAME"
       <> help
-           "NOT YET IMPLEMENTED: The name of the configured connection to run\
-           \ the command on (leave out for ‘all connections’)"
+           "The name of the configured connection to run the command on."
 
 -- TODO Add better parse errors here
 -- TODO Unify used format string with Aq2Ledger.Format.asAqDate
@@ -60,13 +59,14 @@ data Options
   = Download
       { from :: Day,
         to :: Maybe Day,
-        configFile :: Maybe FilePath
+        configFile :: Maybe FilePath,
+        connectionName :: ConnectionName
       }
   | Print
       { from :: Day,
         to :: Maybe Day,
         configFile :: Maybe FilePath,
-        connection :: Maybe ConnectionName
+        connectionName :: ConnectionName
       }
   | ExampleConfig
   deriving (Show)
@@ -90,6 +90,7 @@ downloadOptions =
                      \ 'today')"
           )
       <*> configFileOption
+      <*> connectionOption
 
 printOptions :: Parser Options
 printOptions =
