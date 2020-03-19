@@ -32,7 +32,6 @@ localTransactions :: ConnectionName -> Aq Text
 localTransactions nam = do
   con <- connection nam
   exists <- liftIO . doesFileExist $ contextFile con
-  -- TODO Check for file not being parseable?
   if exists
     then
       read con aqbankingExe

@@ -29,12 +29,12 @@ import System.Process (callProcess, readProcessWithExitCode)
 {-|
 Monad stack representing AqBanking computations.
 -}
-newtype Aq a = Aq {unAq :: ExceptT Text (ReaderT Config IO) a}
+newtype Aq a = Aq {unAq :: ExceptT AqException (ReaderT Config IO) a}
   deriving
     ( Applicative,
       Functor,
       Monad,
-      MonadError Text,
+      MonadError AqException,
       MonadIO,
       MonadReader Config
     )
@@ -42,26 +42,40 @@ newtype Aq a = Aq {unAq :: ExceptT Text (ReaderT Config IO) a}
 {-|
 Helper function to run @Aq@ computations.
 -}
-runAq :: Config -> Aq a -> IO (Either Text a)
+runAq :: Config -> Aq a -> IO (Either AqException a)
 runAq conf aq = runReaderT (runExceptT . unAq $ aq) conf
+
+-- TODO Generalize: NonFatal always if there is a ConnectionName argument
+{-|
+Exceptions thrown when interacting with AqBanking.
+
+Fatal exceptions lead to @aq2ledger@ not being able to continue at all while
+non-fatal exceptions only lead to aborting processing the connection currently
+being processed.
+-}
+data AqException
+  = AqFatal Text
+  | AqNonFatal Text
+  deriving (Show)
+
+instance Exception AqException
 
 {-|
 Tries to extract the subconfiguration of the connection of the given name from
 the configuration.
 -}
 connection
-  :: (MonadError Text m, MonadReader Config m)
-  => Text
-  -> m ConnectionConfig
+  :: Text
+  -> Aq ConnectionConfig
 connection nam = do
-  conn <- asks (connection' nam)
-  case conn of
-    Just conn -> return conn
-    Nothing ->
-      throwError $ "No connection configured with name '" <> nam <> "'"
+  con <- asks (connection' nam)
+  maybe noConConfError return con
   where
     connection' :: Text -> Config -> Maybe ConnectionConfig
     connection' nam = find ((nam ==) . name) . connections
+    noConConfError =
+      throwError . AqNonFatal
+        $ "No connection configured with name '" <> nam <> "'"
 
 {-|
 Runs the command with the supplied arguments using the first argument to
@@ -79,18 +93,17 @@ We use 'String's for command names and arguments because 'System.Process' only
 accepts those.
 -}
 read
-  :: (MonadError Text m, MonadIO m, MonadReader Config m)
-  => ConnectionConfig
+  :: ConnectionConfig
   -> (Config -> String)
   -> [String]
-  -> m Text
+  -> Aq Text
 read conn prog args = do
   cmd <- asks prog
   (exitCode, stdout, stderr) <-
     liftIO
       $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
   if exitCode /= ExitSuccess
-    then throwError $ T.pack stderr
+    then throwError . AqNonFatal $ T.pack stderr
     else return $ T.pack stdout
 
 {-|
@@ -99,30 +112,26 @@ or check any of the command's exit code, stdout or stderr) providing it with an
 empty stdin (see 'interact' for the non-empty stdin).
 -}
 run
-  :: (MonadIO m, MonadReader Config m)
-  => ConnectionConfig
+  :: ConnectionConfig
   -> (Config -> String)
   -> [String]
-  -> m ()
+  -> Aq ()
 run conn prog args = do
   cmd <- asks prog
-  _ <- liftIO $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
-  return ()
+  void . liftIO $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
 
 {-|
 Like 'read' but runs the command and allows to interact with it (i.e. nothing is
 piped into stdin).
 -}
 interact
-  :: (MonadIO m, MonadReader Config m)
-  => ConnectionConfig
+  :: ConnectionConfig
   -> (Config -> String)
   -> [String]
-  -> m ()
+  -> Aq ()
 interact conn prog args = do
   cmd <- asks prog
-  _ <- liftIO $ callProcess cmd (["-D", path conn] <> args)
-  return ()
+  void . liftIO $ callProcess cmd (["-D", path conn] <> args)
 
 {-|
 Today's date.

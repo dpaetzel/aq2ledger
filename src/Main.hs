@@ -40,27 +40,33 @@ main = processOptions =<< execParser options'
                  "aq2ledger – gettin' your online banking stuff into (H)Ledger"
         )
 
+-- TODO Collect all NonFatal errors and print them at the end in a summary
 processOptions :: Options -> IO ()
 processOptions ExampleConfig =
   putText . decodeUtf8 . encode $ (def :: Config)
-processOptions (Download from to confFile' nam) = do
-  confFile <- maybe defaultConfigFile return confFile'
-  conf <- readConfigFile confFile
-  case conf of
-    Left err -> putStrLn err
-    Right conf -> do
-      -- TODO Catch errors here and print them
-      _ <- runAq conf $ downloadTxs from to nam
-      return ()
-processOptions (Print from to confFile' nam) = do
-  confFile <- maybe defaultConfigFile return confFile'
-  conf <- readConfigFile confFile
-  -- TODO Get rid of this ugly repetition
-  case conf of
-    Left err -> putStrLn err
-    Right conf -> do
-      _ <- runAq conf $ printTxs from to nam
-      return ()
+processOptions (Download from to confFile' (Just nam)) = do
+  conf <- getConfig confFile'
+  void . runAq conf $ downloadTxs from to nam
+processOptions (Download from to confFile' Nothing) = do
+  conf <- getConfig confFile'
+  sequence_
+    $ forAllCons conf
+    $ runAq conf . downloadTxs from to
+processOptions (Print from to confFile' (Just nam)) = do
+  conf <- getConfig confFile'
+  void . runAq conf $ printTxs from to nam
+processOptions (Print from to confFile' Nothing) = do
+  conf <- getConfig confFile'
+  sequence_
+    $ forAllCons conf
+    $ runAq conf . printTxs from to
+
+{-|
+Maps over all connections in the given configuration, collecting results in a
+list.
+-}
+forAllCons :: Config -> (ConnectionName -> b) -> [b]
+forAllCons conf = (<$> (name <$> connections conf))
 
 {-|
 Downloads the transactions of the connection (given by the connection name) that
@@ -97,17 +103,6 @@ downloadTxs' from toM nam t = do
     $ let from' = maybe (addDays 1 from) tdate (lastMay t')
        in downloadTxs' from' toM nam t'
 
-parseLocalTxs :: ConnectionName -> Aq [Transaction]
-parseLocalTxs nam = do
-  conf <- ask
-  s <- localTransactions nam `catchError` (\e -> do (putText . show) e; return "")
-  let tE =
-        ($ accountNameMap conf)
-          <$> mapLeft show (parse (listtrans fromIBANDE) "" (T.unpack s))
-  case tE of
-    Left e -> throwError e
-    Right t -> return t
-
 {-|
 Prints the transactions of the connection given by the connection name that
 happened between the two dates. If the second date is left out, it is treated as
@@ -127,7 +122,52 @@ printTxs from to nam = do
         <$> restrictTxs from to t
 
 {-|
-Parses the given config file.
+Parses the transactions stored locally in the CTX file of the connection
+specified by the given name.
+-}
+parseLocalTxs :: ConnectionName -> Aq [Transaction]
+-- TODO Make this fail non-fatally
+parseLocalTxs nam = do
+  conf <- ask
+  -- TODO Deal with this weird line
+  s <- localTransactions nam
+  -- `catchError` (\e -> do (putText . show) e; return "")
+  either throwError return
+    $ ($ accountNameMap conf)
+      <$> mapLeft tagError
+            (parse (listtrans fromIBANDE) "" (T.unpack s))
+  where
+    tagError =
+      AqNonFatal
+        . ("Parsing `aqbanking-cli listtrans` output failed: " <>)
+        . show
+
+{-|
+There are two kinds of errors. Ones that lead to aborting everything (e.g.
+config couldn't be parsed) and ones that only lead to aborting something (these
+get put into a summary at the end).
+-}
+newtype A2LException = A2LFatal Text
+  deriving (Show)
+
+instance Exception A2LException
+
+{-|
+Gets the config, either from the given file or from its default location.
+-}
+getConfig :: Maybe FilePath -> IO Config
+getConfig confFile' = do
+  confFile <- liftIO $ maybe defaultConfigFile return confFile'
+  confE <- readConfigFile confFile
+  case confE of
+    Left err ->
+      throwIO
+        . A2LFatal
+        $ "Config parsing error: " <> T.pack err
+    Right conf -> return conf
+
+{-|
+Reads from disk and parses the given config file.
 
 An alternative implementation may be
 
