@@ -24,6 +24,8 @@ import Aq2Ledger.Config
 import Aq2Ledger.Prelude
 import qualified Data.Text as T
 import Data.Time (Day, getCurrentTime, utctDay)
+import System.Console.ANSI
+import System.IO (BufferMode (..), hSetBuffering, stdout)
 import System.Process (callProcess, readProcessWithExitCode)
 
 {-|
@@ -76,6 +78,13 @@ connection nam = do
     noConConfError =
       throwError . AqNonFatal
         $ "No connection configured with name '" <> nam <> "'"
+
+putInfo :: Text -> Aq ()
+putInfo msg = do
+  liftIO $ hSetBuffering stdout NoBuffering
+  liftIO $ setSGR [SetColor Foreground Vivid Green]
+  putStrLn msg
+  liftIO $ setSGR [Reset]
 
 {-|
 Runs the command with the supplied arguments using the first argument to

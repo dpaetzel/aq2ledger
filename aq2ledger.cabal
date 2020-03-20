@@ -17,6 +17,7 @@ extra-source-files:  config.yml
 executable aq2ledger
   default-language:    Haskell2010
   build-depends:       aeson
+                     , ansi-terminal
                      , base ^>=4.12.0.0
                      , bytestring
                      , Decimal
@@ -52,6 +53,7 @@ executable aq2ledger
 library
   default-language:    Haskell2010
   build-depends:       aeson
+                     , ansi-terminal
                      , base ^>=4.12.0.0
                      , bytestring
                      , Decimal
@@ -87,6 +89,7 @@ library
 
 executable aq2ledger-test
   build-depends:       aeson
+                     , ansi-terminal
                      , base ^>=4.12.0.0
                      , bytestring
                      , Decimal

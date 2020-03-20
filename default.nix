@@ -1,6 +1,6 @@
-{ mkDerivation, aeson, base, bytestring, Decimal, directory, filepath
-, hledger-lib, mtl, optparse-applicative, parsec, process, protolude, QuickCheck
-, quickcheck-instances, stdenv, text, yaml }:
+{ mkDerivation, aeson, ansi-terminal, base, bytestring, Decimal, directory
+, filepath, hledger-lib, mtl, optparse-applicative, parsec, process, protolude
+, QuickCheck, quickcheck-instances, stdenv, text, yaml }:
 # TODO aqbanking is not working in master currently (PR pending)
 # , aqbanking }:
 mkDerivation {
@@ -11,6 +11,7 @@ mkDerivation {
   isExecutable = true;
   libraryHaskellDepends = [
     aeson
+    ansi-terminal
     base
     bytestring
     Decimal
@@ -29,6 +30,7 @@ mkDerivation {
   ];
   executableHaskellDepends = [
     aeson
+    ansi-terminal
     base
     bytestring
     Decimal

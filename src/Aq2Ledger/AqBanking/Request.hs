@@ -71,7 +71,7 @@ dates.
 getTransactions :: ConnectionName -> Day -> Day -> Aq ()
 getTransactions nam from to = do
   con <- connection nam
-  putText
+  putInfo
     $ "Downloading all transactions between "
       <> show from
       <> " and "
