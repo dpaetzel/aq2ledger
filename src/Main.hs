@@ -147,10 +147,13 @@ There are two kinds of errors. Ones that lead to aborting everything (e.g.
 config couldn't be parsed) and ones that only lead to aborting something (these
 get put into a summary at the end).
 -}
-newtype A2LException = A2LFatal Text
+newtype A2LException a
+  = A2LFatal
+      { unA2LFatal :: a
+      }
   deriving (Show)
 
-instance Exception A2LException
+instance Exception a => Exception (A2LException a)
 
 {-|
 Gets the config, either from the given file or from its default location.
@@ -160,10 +163,7 @@ getConfig confFile' = do
   confFile <- liftIO $ maybe defaultConfigFile return confFile'
   confE <- readConfigFile confFile
   case confE of
-    Left err ->
-      throwIO
-        . A2LFatal
-        $ "Config parsing error: " <> T.pack err
+    Left err -> throwIO . A2LFatal $ err
     Right conf -> return conf
 
 {-|
@@ -177,5 +177,5 @@ An alternative implementation may be
 >     . liftIO
 >     . Y.decodeFileEither
 -}
-readConfigFile :: FilePath -> IO (Either String Config)
-readConfigFile = fmap (first Y.prettyPrintParseException) . Y.decodeFileEither
+readConfigFile :: FilePath -> IO (Either Y.ParseException Config)
+readConfigFile = Y.decodeFileEither
