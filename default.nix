@@ -1,6 +1,6 @@
 { mkDerivation, aeson, ansi-terminal, base, bytestring, Decimal, directory
-, filepath, hledger-lib, mtl, optparse-applicative, parsec, process, protolude
-, QuickCheck, quickcheck-instances, stdenv, text, yaml }:
+, filepath, hledger-lib, mtl, optparse-applicative, parsec, protolude
+, QuickCheck, quickcheck-instances, stdenv, typed-process, text, yaml }:
 # TODO aqbanking is not working in master currently (PR pending)
 # , aqbanking }:
 mkDerivation {
@@ -21,7 +21,7 @@ mkDerivation {
     mtl
     optparse-applicative
     parsec
-    process
+    typed-process
     protolude
     QuickCheck
     quickcheck-instances
@@ -40,7 +40,7 @@ mkDerivation {
     mtl
     optparse-applicative
     parsec
-    process
+    typed-process
     protolude
     QuickCheck
     quickcheck-instances

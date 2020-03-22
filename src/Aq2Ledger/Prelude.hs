@@ -26,6 +26,6 @@ import Test.QuickCheck as X hiding
 import qualified Prelude
 
 {-|
-This type alias is needed because 'System.Process' uses 'Prelude.String's.
+This type alias is needed because 'System.Process.Typed' uses 'Prelude.String's.
 -}
 type String = Prelude.String

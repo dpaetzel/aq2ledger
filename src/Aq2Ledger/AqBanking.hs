@@ -22,11 +22,13 @@ where
 
 import Aq2Ledger.Config
 import Aq2Ledger.Prelude
+import Data.List (unwords)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy.Encoding as TL
 import Data.Time (Day, getCurrentTime, utctDay)
 import System.Console.ANSI
 import System.IO (BufferMode (..), hSetBuffering, stdout)
-import System.Process (callProcess, readProcessWithExitCode)
+import System.Process.Typed
 
 {-|
 Monad stack representing AqBanking computations.
@@ -56,8 +58,12 @@ non-fatal exceptions only lead to aborting processing the connection currently
 being processed.
 -}
 data AqException
-  = AqFatal Text
-  | AqNonFatal Text
+  = AqFatal
+      { msg :: Text
+      }
+  | AqNonFatal
+      { msg :: Text
+      }
   deriving (Show)
 
 instance Exception AqException
@@ -79,6 +85,9 @@ connection nam = do
       throwError . AqNonFatal
         $ "No connection configured with name '" <> nam <> "'"
 
+{-|
+Outputs an info message in a positive colour.
+-}
 putInfo :: Text -> Aq ()
 putInfo msg = do
   liftIO $ hSetBuffering stdout NoBuffering
@@ -98,8 +107,11 @@ read aqhbciExe []
 is an 'Aq' action that runs the configured @aqhbci-tool4@ executable without
 arguments and returns its standard output.
 
-We use 'String's for command names and arguments because 'System.Process' only
-accepts those.
+We use 'String's for command names and arguments because 'System.Process.Typed'
+only accepts those.
+
+If the created process's exit code indicates failure, throws an exception
+containing its stdout and stderr.
 -}
 read
   :: ConnectionConfig
@@ -108,31 +120,21 @@ read
   -> Aq Text
 read conn prog args = do
   cmd <- asks prog
-  (exitCode, stdout, stderr) <-
-    liftIO
-      $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
-  if exitCode /= ExitSuccess
-    then throwError . AqNonFatal $ T.pack stderr
-    else return $ T.pack stdout
+  (stdout, _) <- readProcess_ (proc cmd (["-D", path conn] <> args))
+  -- TODO Is it really OK to use `toStrict` here?
+  return . toStrict . TL.decodeUtf8 $ stdout
 
 {-|
-Like 'read' but only runs the command in a fire-and-forget way (doesn't return
-or check any of the command's exit code, stdout or stderr) providing it with an
-empty stdin (see 'interact' for the non-empty stdin).
--}
-run
-  :: ConnectionConfig
-  -> (Config -> String)
-  -> [String]
-  -> Aq ()
-run conn prog args = do
-  cmd <- asks prog
-  void . liftIO $ readProcessWithExitCode cmd (["-D", path conn] <> args) mempty
+Like 'read' but runs the command and allows to interact with it (i.e. stdin is
+not fixed).
 
-{-|
-Like 'read' but runs the command and allows to interact with it (i.e. nothing is
-piped into stdin).
+Other than 'read', while this does throw an exception if the created process's
+exit code indicates failure as well, it does not containing the process's stdout
+and stderr (otherwise proper user interaction is hindered by e.g. prompts being
+output after the user enters input).
 -}
+-- NOTE I've looked into using pipes to properly handle prompts but that didn't
+-- work out straightforwardly either.
 interact
   :: ConnectionConfig
   -> (Config -> String)
@@ -140,7 +142,22 @@ interact
   -> Aq ()
 interact conn prog args = do
   cmd <- asks prog
-  void . liftIO $ callProcess cmd (["-D", path conn] <> args)
+  putInfo
+    . T.pack
+    . ("Interacting with " <>)
+    . unwords
+    . fmap (wrap "'")
+    $ [cmd, "-D", path conn] <> args
+  -- TODO aqbanking-cli's exit code is positive even if the user aborts the
+  -- dialog leading to no exception being thrown here. This could only be
+  -- detected by analysing stdout/stderr …
+  runProcess_ (proc cmd (["-D", path conn] <> args))
+
+{-|
+Wraps its second argument by its first argument.
+-}
+wrap :: Monoid m => m -> m -> m
+wrap c x = c <> x <> c
 
 {-|
 Today's date.

@@ -41,10 +41,10 @@ data Config
   = Config
       { aqhbciExe :: String,
         -- ^ File path or name of the @aqhbci-tool4@ executable. We use 'String'
-        -- because 'System.Process' only deals with those.
+        -- because 'System.Process.Typed' only deals with those.
         aqbankingExe :: String,
         -- ^ File path or name of the @aqbanking-cli@ executable. We use
-        -- 'String' because 'System.Process' only deals with those.
+        -- 'String' because 'System.Process.Typed' only deals with those.
         accounts :: [(BankAccount, AccountName)],
         -- ^ Mapping of bank accounts to account names used in Hledger journal.
         connections :: [ConnectionConfig]
