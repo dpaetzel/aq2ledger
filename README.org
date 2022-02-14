@@ -3,6 +3,10 @@
 text format readable by [[https://www.ledger-cli.org/][Ledger]] and its [[https://plaintextaccounting.org/][derivatives]]. Inspired by (actually, kind
 of a rewrite of) Johannes Gerer's [[https://github.com/johannesgerer/buchhaltung][buchhaltung]] which seized to work due to PSD2
 coming into effect making support for more recent AqBanking versions mandatory.
+* Warning: This repository is archived now
+  … because I myself switched to exporting CSV's and using /hledger/'s straightforward ~import~ subcommand. While
+  an automatic download would be, of course, much more convenient, right now I don't have the time to make aqledger
+  stable and reliable enough for it being really usable.
 * Aims
   - [ ] Setup AqBanking automagically.
     - For now, this has to be done manually.
